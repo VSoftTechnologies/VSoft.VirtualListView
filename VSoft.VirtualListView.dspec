@@ -1,0 +1,151 @@
+{
+   "metadata":{
+      "id":"VSoft.VirtualListView",
+      "version":"0.0.1-alpha3",
+      "description":"Owner drawn VCL Virtual List View",
+      "owners":"VSoft Technologies Pty Ltd",
+      "authors":"Vincent Parrett",
+      "projectUrl":"https://github.com/VSoftTechnologies/VSoft.VirtualListView",
+      "license":"Apache-2.0",
+      "copyright":"Vincent Parrett and contributors",
+      "tags":"vcl listview virtual"
+   },
+   "targetPlatforms":[
+      {
+         "compiler":"XE2",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"XE3",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"XE4",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"XE5",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"XE6",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"XE7",
+         "platforms":"Win32, Win64",
+         "template":"default"
+      },
+      {
+         "compiler":"XE8",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"10.0",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"10.1",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"10.2",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"10.3",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      },
+      {
+         "compiler":"10.4",
+         "platforms":"Win32, Win64",
+         "template":"noPackages"
+      }
+   ],
+   "templates":[
+      {
+        "comment" : "just a placeholder until we can create packages for the other platforms",
+        "name" : "noPackages",
+         "source":[
+            {
+               "src":"source\\*.pas",
+               "flatten":true,
+               "dest":"Source"
+            }
+         ],
+         "searchPaths":[
+            {
+               "path":"Source"
+            }
+         ]
+      },
+      {
+         "name":"default",
+         "source":[
+            {
+               "src":"source\\*.pas",
+               "flatten":true,
+               "dest":"Source"
+            },
+            {
+             "src":"packages\\Rad Studio $compiler$\\*.dp*",
+             "exclude": ["*.dproj.local"],
+             "dest":"packages\\Rad Studio $compiler$"
+            }
+         ],
+         "searchPaths":[
+            {
+               "path" : "lib"
+            },
+            {
+               "path":"Source"
+            }
+         ],
+         "runtime" : [
+          {
+            "preBuilt": "false",
+            "src" : "bin\\VirtualListViewR$libsuffix$.bpl",
+            "dest" : "bin",
+            "copyLocal" : "true"
+          }
+         ],
+         "design" : [
+          {
+            "preBuilt": "false",
+            "src" : "bin\\VirtualListViewD$libsuffix$.bpl",
+            "dest" : "bin",
+            "install": "true"
+          }
+         ],
+         "build" : [
+            {
+              "comment" : "The id links the package to the runtime or designtime entry",
+              "id" : "VirtualListViewR$libsuffix$.bpl",
+              "project" : "packages\\Rad Studio {compiler}\VSoft.VirtualListViewR.dproj",
+              "configuration" : "Release",
+              "bplOutputDir" : "bin",
+              "dcuOutputDir" : "lib",
+              "dcpOutputDir" : "lib"
+            },
+            {
+              "id" : "VirtualListViewD$libsuffix$.bpl",
+              "project" : "packages\\Rad Studio {compiler}\VSoft.VirtualListViewD.dproj",
+              "configuration" : "Release",
+              "bplOutputDir" : "bin",
+              "dcuOutputDir" : "lib",
+              "dcpOutputDir" : "lib"
+            }
+         ]
+      }
+   ]
+}
