@@ -108,6 +108,7 @@ type
     constructor Create(AOwner : TComponent);override;
     destructor Destroy;override;
     class constructor Create;
+    procedure InvalidateRow(const index : Int64);
   published
     property Align;
     property Anchors;
@@ -339,6 +340,24 @@ begin
       result := rsSelected
     else if rowIdx = FHoverRow then
       result := rsHot;
+  end;
+end;
+
+procedure TVSoftVirtualListView.InvalidateRow(const index: Int64);
+var
+  rowState : TPaintRowState;
+  row : integer;
+begin
+  //work out if the row is actually visible;
+  if FRowCount = 0 then
+    exit;
+  if (index < 0) or (index > FRowCount) then
+    exit;
+
+  if (index >= FTopRow) and (index < FTopRow + FVisibleRows) then
+  begin
+    rowState := GetRowPaintState(index - FTopRow);
+    DoOnPaintRow(FRowRects[index - FTopRow], index, rowState);
   end;
 end;
 
@@ -884,7 +903,6 @@ begin
   if HandleAllocated then
   begin
     FVisibleRows :=  ClientHeight div RowHeight;
-    //FVisibleRows := Min(FVisibleRows, FRowCount);
     FSelectableRows := FVisibleRows; //the number of full rows
     if (FRowCount > FVisibleRows) and (ClientHeight mod RowHeight > 0) then
     begin

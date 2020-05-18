@@ -14,11 +14,14 @@ type
     Label1: TLabel;
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     FVirtualListView : TVSoftVirtualListView;
+    FPackageName : string;
   protected
     procedure PaintRow(const Sender : TObject; const ACanvas : TCanvas; const itemRect : TRect; const index : Int64; const rowState : TPaintRowState);
     procedure PaintNoRows(const Sender : TObject; const ACanvas : TCanvas; const paintRect : TRect);
@@ -43,6 +46,12 @@ begin
   FVirtualListView.RowCount := 1500;
 end;
 
+procedure TForm2.Button3Click(Sender: TObject);
+begin
+  FPackageName := 'VSoft.DUnitX';
+  FVirtualListView.InvalidateRow(4);
+end;
+
 procedure TForm2.FormCreate(Sender: TObject);
 begin
   FVirtualListView := TVSoftVirtualListView.Create(Self);
@@ -56,7 +65,7 @@ begin
   FVirtualListView.OnPaintNoRows := Self.PaintNoRows;
   FVirtualListView.OnRowChange := Self.RowChanged;
   FVirtualListView.Parent := Self;
-
+  FPackageName := 'VSoft.Awaitable';
 end;
 
 procedure TForm2.PaintNoRows(const Sender: TObject; const ACanvas: TCanvas; const paintRect: TRect);
@@ -87,7 +96,11 @@ begin
 //  ACanvas.Brush.Style:=bsClear;
   oldSize := ACanvas.Font.Size;
   ACanvas.Font.Size := 11;
-  ACanvas.TextOut(itemRect.Left + 3, itemRect.Top + 2, 'VSoft.Awaitable  ' + IntToStr(index) );
+  if index = 4 then
+    ACanvas.TextOut(itemRect.Left + 3, itemRect.Top + 2, FPackageName + '  ' + IntToStr(index))
+  else
+    ACanvas.TextOut(itemRect.Left + 3, itemRect.Top + 2, 'VSoft.Awaitable  ' + IntToStr(index) );
+
   ACanvas.Font.Size := oldSize;
   ACanvas.TextOut(itemRect.Left + 150, itemRect.Top + 5, 'by Vincent Parrett');
   ACanvas.TextOut(itemRect.Left + 5, itemRect.Top + 20, 'This is Row : ' + IntToStr(index) + ' descriptions of some sort');
