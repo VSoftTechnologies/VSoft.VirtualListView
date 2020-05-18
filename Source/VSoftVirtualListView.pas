@@ -846,30 +846,29 @@ begin
     exit;
 
   prevVisible := FScrollBarVisible;
+  sbInfo.cbSize := SizeOf(TScrollInfo);
+  sbInfo.fMask := SIF_ALL;
+    sbInfo.nMin := 0;
 
+  //Note : this may trigger a resize if the visibility changes
   if FRowCount <= FSelectableRows  then
   begin
     FScrollBarVisible := false;
-    Winapi.Windows.ShowScrollBar(Handle, SB_VERT, false);
+    sbInfo.nMax := 0;
+    sbInfo.nPage := 0;
+    sbInfo.nPos := 0;
+    SetScrollInfo(Handle, SB_VERT, sbInfo, True);
   end
   else
   begin
-    sbInfo.cbSize := SizeOf(TScrollInfo);
-    sbInfo.fMask := SIF_ALL;
-    sbInfo.nMin := 0;
+    FScrollBarVisible := true;
     sbInfo.nMax := Max(FRowCount -1, 0);
     sbInfo.nPage := Min(FSelectableRows, FRowCount -1);
     sbInfo.nPos := Min(FScrollPos, FRowCount -1) ;
     SetScrollInfo(Handle, SB_VERT, sbInfo, True);
-    FScrollBarVisible := true;
-    Winapi.Windows.ShowScrollBar(Handle, SB_VERT, true);
   end;
   if prevVisible <> FScrollBarVisible then
-  begin
-    RedrawWindow(Handle, nil, 0, RDW_INVALIDATE or RDW_UPDATENOW or RDW_FRAME );
-//    Application.ProcessMessages;
-  // Invalidate;
-  end;
+    Invalidate;
 end;
 
 procedure TVSoftVirtualListView.UpdateVisibleRows;
