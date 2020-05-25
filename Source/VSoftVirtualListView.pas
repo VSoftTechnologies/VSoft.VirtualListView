@@ -112,6 +112,11 @@ type
   published
     property Align;
     property Anchors;
+    property BevelEdges;
+    property BevelInner;
+    property BevelOuter;
+    property BevelKind;
+    property BevelWidth;
     property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
     property Color default clWindow;
     property Enabled;
@@ -188,10 +193,6 @@ begin
   FScrollBarVisible := false;
   FRowRects := TList<TRect>.Create;
   ControlStyle := [csDoubleClicks, csCaptureMouse, csDisplayDragImage, csClickEvents, csPannable];
-  BevelKind := bkNone;
-  BevelInner := bvNone;
-  BevelOuter := bvNone;
-  BevelEdges := [];
   FScrollPos := 0;
   FHoverRow := -1;
   FRowHeight := 40;

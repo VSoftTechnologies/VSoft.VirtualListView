@@ -56,9 +56,11 @@ procedure TForm2.FormCreate(Sender: TObject);
 begin
   FVirtualListView := TVSoftVirtualListView.Create(Self);
   FVirtualListView.Align := alClient;
-  FVirtualListView.BorderStyle := bsSingle;
+  FVirtualListView.BorderStyle := bsNone;
+  FVirtualListView.BevelOuter := TBevelCut.bvLowered;
+  FVirtualListView.BevelInner := TBevelCut.bvNone;
+  FVirtualListView.BevelKind := TBevelKind.bkFlat;
   FVirtualListView.DoubleBuffered := true;
-//  FVirtualListView.ParentColor :=
   FVirtualListView.RowHeight := 80;
   FVirtualListView.RowCount := 1500;
   FVirtualListView.OnPaintRow := Self.PaintRow;
