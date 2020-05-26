@@ -568,7 +568,7 @@ var
 begin
   oldCurrentRow := FCurrentRow;
   oldTopRow := FTopRow;
-  if FCurrentRow < FSelectableRows - 1 then
+  if (FCurrentRow < FSelectableRows - 1) and (FCurrentRow < FRowCount -1) then
   begin
     //easy.
     Inc(FCurrentRow);
