@@ -246,6 +246,9 @@ function TVSoftVirtualListView.DoMouseWheelDown(Shift: TShiftState; MousePos: TP
 var
   scrollPos : integer;
 begin
+  if FRowCount = 0 then
+    exit;
+
   scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
   ScrollBarScroll(Self,TScrollCode.scLineDown, scrollPos );
   result := true;
@@ -255,6 +258,9 @@ function TVSoftVirtualListView.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoi
 var
   scrollPos : integer;
 begin
+  if FRowCount = 0 then
+    exit;
+
   scrollPos := Max(0, FScrollPos - 1);
   ScrollBarScroll(Self,TScrollCode.scLineUp, scrollPos );
   result := true;
@@ -278,6 +284,9 @@ var
   delta : integer;
   direction : TScrollDirection;
 begin
+  if FRowCount = 0 then
+    exit;
+
   if not Assigned(FOnRowChangeEvent) then
     exit;
 
@@ -569,6 +578,10 @@ var
   pageSize : integer;
   rowState : TPaintRowState;
 begin
+  if FRowCount = 0 then
+    exit;
+
+
   oldCurrentRow := FCurrentRow;
   oldTopRow := FTopRow;
   if (FCurrentRow < FSelectableRows - 1) and (FCurrentRow < FRowCount -1) then
@@ -608,6 +621,9 @@ var
   fullRepaint : boolean;
   delta : integer;
 begin
+  if FRowCount = 0 then
+    exit;
+
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
   fullRepaint := false;
@@ -671,6 +687,9 @@ var
   oldCurrentRow : integer;
   rowState : TPaintRowState;
 begin
+  if FRowCount = 0 then
+    exit;
+
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
   FCurrentRow := FSelectableRows - 1;
@@ -701,6 +720,9 @@ var
   oldTopRow : integer;
   rowState : TPaintRowState;
 begin
+  if FRowCount = 0 then
+    exit;
+
   oldCurrentRow := FCurrentRow;
   oldTopRow := FTopRow;
   if (oldTopRow <> 0) or (oldCurrentRow <> 0) then
@@ -735,6 +757,9 @@ var
   oldCurrentRow : integer;
   rowState : TPaintRowState;
 begin
+  if FRowCount = 0 then
+    exit;
+
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
   if FCurrentRow  > 0 then
@@ -766,6 +791,10 @@ var
   delta : integer;
   pageSize : integer;
 begin
+  if FRowCount = 0 then
+    exit;
+
+
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
   fullRepaint := false;
