@@ -195,6 +195,7 @@ begin
   ControlStyle := [csDoubleClicks, csCaptureMouse, csDisplayDragImage, csClickEvents, csPannable];
   FScrollPos := 0;
   FHoverRow := -1;
+  FCurrentRow := -1;
   FRowHeight := 40;
   TabStop := true;
   ParentBackground := true;
@@ -382,6 +383,8 @@ var
 begin
   inherited;
   SetFocus;
+  if FRowCount = 0 then
+    exit;
   row := GetRowFromY(Y);
   if  row <> FCurrentRow then
   begin
@@ -848,6 +851,11 @@ begin
       FScrollPos := 0;
     end;
     FRowCount := Value;
+    if FRowCount = 0 then
+    begin
+      FCurrentRow := -1;
+      FHoverRow := -1;
+    end;
 
     if HandleAllocated then
     begin
