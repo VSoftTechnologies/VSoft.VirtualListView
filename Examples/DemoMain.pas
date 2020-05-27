@@ -26,7 +26,10 @@ type
     procedure PaintRow(const Sender : TObject; const ACanvas : TCanvas; const itemRect : TRect; const index : Int64; const rowState : TPaintRowState);
     procedure PaintNoRows(const Sender : TObject; const ACanvas : TCanvas; const paintRect : TRect);
     procedure RowChanged(const Sender : TObject; const newRowIndex : Int64; const direction : TScrollDirection; const delta : Int64);
+
   public
+    procedure MouseWheelHandler(var Message: TMessage); override;
+
   end;
 
 var
@@ -68,6 +71,22 @@ begin
   FVirtualListView.OnRowChange := Self.RowChanged;
   FVirtualListView.Parent := Self;
   FPackageName := 'VSoft.Awaitable';
+end;
+
+//https://stackoverflow.com/questions/2251019/how-to-direct-the-mouse-wheel-input-to-control-under-cursor-instead-of-focused
+procedure TForm2.MouseWheelHandler(var Message: TMessage);
+var
+  Control: TControl;
+begin
+  Control := ControlAtPos(ScreenToClient(SmallPointToPoint(TWMMouseWheel(Message).Pos)), False, True, True);
+  if Assigned(Control) and (Control <> ActiveControl) then
+  begin
+    Message.Result := Control.Perform(CM_MOUSEWHEEL, Message.WParam, Message.LParam);
+    if Message.Result = 0 then
+      Control.DefaultHandler(Message);
+  end
+  else
+    inherited MouseWheelHandler(Message);
 end;
 
 procedure TForm2.PaintNoRows(const Sender: TObject; const ACanvas: TCanvas; const paintRect: TRect);

@@ -32,7 +32,6 @@ object Form2: TForm2
     Caption = 'Panel1'
     ShowCaption = False
     TabOrder = 0
-    ExplicitLeft = 494
     object Label1: TLabel
       Left = 29
       Top = 32

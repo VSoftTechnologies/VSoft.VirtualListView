@@ -588,8 +588,12 @@ begin
   begin
     //easy.
     Inc(FCurrentRow);
-    rowState := GetRowPaintState(oldCurrentRow);
-    DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
+    //there may not have been a current row before.
+    if oldCurrentRow >= 0 then
+    begin
+      rowState := GetRowPaintState(oldCurrentRow);
+      DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
+    end;
     rowState := GetRowPaintState(FCurrentRow);
     DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
   end
