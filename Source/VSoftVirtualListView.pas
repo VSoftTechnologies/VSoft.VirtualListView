@@ -246,24 +246,24 @@ function TVSoftVirtualListView.DoMouseWheelDown(Shift: TShiftState; MousePos: TP
 var
   scrollPos : integer;
 begin
+  result := true;
   if FRowCount = 0 then
     exit;
 
   scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
   ScrollBarScroll(Self,TScrollCode.scLineDown, scrollPos );
-  result := true;
 end;
 
 function TVSoftVirtualListView.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
 var
   scrollPos : integer;
 begin
+  result := true;
   if FRowCount = 0 then
     exit;
 
   scrollPos := Max(0, FScrollPos - 1);
   ScrollBarScroll(Self,TScrollCode.scLineUp, scrollPos );
-  result := true;
 end;
 
 procedure TVSoftVirtualListView.DoOnPaintRow(const itemRect: TRect; const index: Int64; const state: TPaintRowState);
@@ -357,7 +357,6 @@ end;
 procedure TVSoftVirtualListView.InvalidateRow(const index: Int64);
 var
   rowState : TPaintRowState;
-  row : integer;
 begin
   //work out if the row is actually visible;
   if FRowCount = 0 then
