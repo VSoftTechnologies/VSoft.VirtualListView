@@ -37,6 +37,9 @@ var
 
 implementation
 
+uses
+  System.Types;
+
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);
