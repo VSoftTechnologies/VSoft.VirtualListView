@@ -131,7 +131,7 @@
             {
               "comment" : "The id links the package to the runtime or designtime entry",
               "id" : "VirtualListViewR$libsuffix$.bpl",
-              "project" : "packages\\Rad Studio {compiler}\VSoft.VirtualListViewR.dproj",
+              "project" : "packages\\Rad Studio $compiler$\\VSoft.VirtualListViewR.dproj",
               "configuration" : "Release",
               "bplOutputDir" : "bin",
               "dcuOutputDir" : "lib",
@@ -139,7 +139,7 @@
             },
             {
               "id" : "VirtualListViewD$libsuffix$.bpl",
-              "project" : "packages\\Rad Studio {compiler}\VSoft.VirtualListViewD.dproj",
+              "project" : "packages\\Rad Studio $compiler$\\VSoft.VirtualListViewD.dproj",
               "configuration" : "Release",
               "bplOutputDir" : "bin",
               "dcuOutputDir" : "lib",
