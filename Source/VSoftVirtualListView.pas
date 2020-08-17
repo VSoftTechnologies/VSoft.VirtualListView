@@ -260,8 +260,7 @@ begin
   if FRowCount = 0 then
     exit;
 
-  //stopping stack overflow when lots of mousewheel messages come from my logitech mx master 3!
-  if IsAtEnd then
+  if IsAtEnd then //nothing to do
     exit;
 
   scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
@@ -276,8 +275,7 @@ begin
   if FRowCount = 0 then
     exit;
 
-  //stopping stack overflow when lots of mousewheel messages come from my logitech mx master 3!
-  if IsAtTop then
+  if IsAtTop then  //nothing to do
     exit;
 
   scrollPos := Max(0, FScrollPos - 1);

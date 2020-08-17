@@ -23,6 +23,7 @@ type
   private
     FVirtualListView : TVSoftVirtualListView;
     FPackageName : string;
+    FMouseWheeControl: TControl;
   protected
     procedure PaintRow(const Sender : TObject; const ACanvas : TCanvas; const itemRect : TRect; const index : Int64; const rowState : TPaintRowState);
     procedure PaintNoRows(const Sender : TObject; const ACanvas : TCanvas; const paintRect : TRect);
@@ -84,11 +85,14 @@ var
   Control: TControl;
 begin
   Control := ControlAtPos(ScreenToClient(SmallPointToPoint(TWMMouseWheel(Message).Pos)), False, True, True);
-  if Assigned(Control) and (Control <> ActiveControl) then
+  if Assigned(Control) and (Control <> ActiveControl) and (Control <> FMouseWheeControl) then
   begin
+    FMouseWheeControl := Control;  //dealing with stack overflow.
+
     Message.Result := Control.Perform(CM_MOUSEWHEEL, Message.WParam, Message.LParam);
     if Message.Result = 0 then
       Control.DefaultHandler(Message);
+    FMouseWheeControl := nil;
   end
   else
     inherited MouseWheelHandler(Message);
