@@ -56,6 +56,8 @@ type
 
     function RowInView(const row : Int64) : boolean;
     function GetViewRow(const row : Int64) : integer;
+    function IsAtTop : boolean;
+    function IsAtEnd : boolean;
 
     procedure DoRowChanged(const oldCurrentRow : integer);
 
@@ -257,11 +259,12 @@ begin
   if FRowCount = 0 then
     exit;
 
+  //stopping stack overflow when lots of mousewheel messages come from my logitech mx master 3!
+  if IsAtEnd then
+    exit;
 
   scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
   ScrollBarScroll(Self,TScrollCode.scLineDown, scrollPos );
-  UpdateHoverRow(MousePos.X, MousePos.Y);
-
 end;
 
 function TVSoftVirtualListView.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
@@ -272,9 +275,12 @@ begin
   if FRowCount = 0 then
     exit;
 
+  //stopping stack overflow when lots of mousewheel messages come from my logitech mx master 3!
+  if IsAtTop then
+    exit;
+
   scrollPos := Max(0, FScrollPos - 1);
   ScrollBarScroll(Self,TScrollCode.scLineUp, scrollPos );
-  UpdateHoverRow(MousePos.X, MousePos.Y);
 end;
 
 procedure TVSoftVirtualListView.DoOnPaintRow(const itemRect: TRect; const index: Int64; const state: TPaintRowState);
@@ -379,6 +385,16 @@ begin
     rowState := GetRowPaintState(index);
     DoOnPaintRow(FRowRects[GetViewRow(index)], index, rowState);
   end;
+end;
+
+function TVSoftVirtualListView.IsAtEnd: boolean;
+begin
+  result := FScrollPos = FRowCount - FSelectableRows;
+end;
+
+function TVSoftVirtualListView.IsAtTop: boolean;
+begin
+  result := FScrollPos = 0;
 end;
 
 procedure TVSoftVirtualListView.KeyDown(var Key: Word; Shift: TShiftState);
@@ -588,6 +604,9 @@ begin
     else
       exit;
 
+    if FHoverRow <> -1 then
+      Inc(FHoverRow);
+
     FScrollPos := FTopRow;
     //we scrolled so full paint.
     Invalidate;
@@ -621,6 +640,8 @@ begin
         begin
           Inc(FCurrentRow);
           Inc(FTopRow);
+          if FHoverRow <> -1 then
+            Inc(FHoverRow);
           FScrollPos := FTopRow;
           DoRowChanged(oldCurrentRow);
           Invalidate;
@@ -788,6 +809,9 @@ begin
     if FTopRow > 0 then
     begin
       Dec(FTopRow);
+      if FHoverRow > 0 then
+        Dec(FHoverRow);
+
       FScrollPos := FTopRow;
       //we scrolled so full paint.
       Invalidate;
@@ -802,6 +826,8 @@ begin
       if  ((FCurrentRow - FTopRow ) > 0) then
       begin
         Dec(FCurrentRow);
+        if FHoverRow > 0 then
+          Dec(FHoverRow);
         //no scrolling required so just paint the affected rows.
         //there may not have been a current row before.
         if (oldCurrentRow >= 0) and RowInView(oldCurrentRow) then
@@ -822,6 +848,8 @@ begin
         begin
           Dec(FCurrentRow);
           Dec(FTopRow);
+          if FHoverRow > 0 then
+            Dec(FHoverRow);
           FScrollPos := FTopRow;
           DoRowChanged(oldCurrentRow);
           Invalidate;
@@ -998,12 +1026,12 @@ end;
 procedure TVSoftVirtualListView.UpdateScrollBar;
 var
   sbInfo : TScrollInfo;
-  prevVisible : boolean;
+  //prevVisible : boolean;
 begin
   if not HandleAllocated then
     exit;
 
-  prevVisible := FScrollBarVisible;
+//  prevVisible := FScrollBarVisible;
   sbInfo.cbSize := SizeOf(TScrollInfo);
   sbInfo.fMask := SIF_ALL;
   sbInfo.nMin := 0;
@@ -1092,7 +1120,7 @@ procedure TVSoftVirtualListView.WMVScroll(var Message: TWMVScroll);
 var
   p : Integer;
 begin
-  Message.Result := 1;
+  Message.Result := 0;
   with Message do
   begin
     if ScrollCode = 8 then
