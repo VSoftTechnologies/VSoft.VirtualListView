@@ -69,11 +69,12 @@ begin
   FVirtualListView.BevelKind := TBevelKind.bkFlat;
   FVirtualListView.DoubleBuffered := true;
   FVirtualListView.RowHeight := 80;
-  FVirtualListView.RowCount := 4;
+  FVirtualListView.RowCount := 20;
   FVirtualListView.OnPaintRow := Self.PaintRow;
   FVirtualListView.OnPaintNoRows := Self.PaintNoRows;
   FVirtualListView.OnRowChange := Self.RowChanged;
   FVirtualListView.Parent := Self;
+  FVirtualListView.TabStop := true;
   FPackageName := 'VSoft.Awaitable';
 end;
 
