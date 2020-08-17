@@ -70,12 +70,13 @@ begin
   FVirtualListView.BevelKind := TBevelKind.bkFlat;
   FVirtualListView.DoubleBuffered := true;
   FVirtualListView.RowHeight := 80;
-  FVirtualListView.RowCount := 20;
+  FVirtualListView.RowCount := 200;
   FVirtualListView.OnPaintRow := Self.PaintRow;
   FVirtualListView.OnPaintNoRows := Self.PaintNoRows;
   FVirtualListView.OnRowChange := Self.RowChanged;
   FVirtualListView.Parent := Self;
   FVirtualListView.TabStop := true;
+  FVirtualListView.TabOrder := 0;
   FPackageName := 'VSoft.Awaitable';
 end;
 
@@ -123,7 +124,6 @@ begin
   end;
 
   ACanvas.FillRect(itemRect);
-//  ACanvas.Brush.Style:=bsClear;
   oldSize := ACanvas.Font.Size;
   ACanvas.Font.Size := 11;
   if index = 4 then
