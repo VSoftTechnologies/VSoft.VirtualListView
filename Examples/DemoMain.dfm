@@ -40,7 +40,7 @@ object Form2: TForm2
       Caption = 'Label1'
     end
     object Label2: TLabel
-      Left = 32
+      Left = 29
       Top = 64
       Width = 31
       Height = 13

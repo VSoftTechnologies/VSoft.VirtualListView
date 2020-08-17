@@ -141,8 +141,8 @@ end;
 
 procedure TForm2.RowChanged(const Sender: TObject; const newRowIndex: Int64; const direction: TScrollDirection; const delta: Int64);
 begin
-   Label1.Caption := 'Row : ' + IntToStr(newRowIndex) + ' Delta : ' + IntToStr(delta) ;
-   Label2.Caption := 'Current Row : ' + IntToStr(FVirtualListView.CurrentRow);
+   Label1.Caption := 'Current (Event) : ' + IntToStr(newRowIndex) + ' Direction : ' + IntToStr(delta) ;
+   Label2.Caption := 'Current Row : ' + IntToStr(FVirtualListView.CurrentRow) + ' Top Row : ' + IntToStr(FVirtualListView.TopRow);
 end;
 
 end.
