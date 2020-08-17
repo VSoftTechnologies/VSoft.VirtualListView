@@ -38,10 +38,11 @@ type
 
     FVisibleRows : integer; //number of rows we can see
     FSelectableRows : integer; //number of rows we can click on
-    FTopRow : Int64; //this is the cursor in all the rows.
+
+    FTopRow : Int64; //this is the top row cursor .
     FCurrentRow : Int64; //this is our cursor within the visible rows
 
-    FHoverRow : integer; //mouse over
+    FHoverRow : integer; //mouse over row in view (add to top row to get index
 
     FRowRects : TList<TRect>;
 
@@ -53,7 +54,10 @@ type
     procedure AdjustClientRect(var Rect: TRect); override;
     procedure UpdateScrollBar;
 
-    procedure DoRowChanged(const oldTopRow, oldCurrentRow : integer);
+    function RowInView(const row : Int64) : boolean;
+    function GetViewRow(const row : Int64) : integer;
+
+    procedure DoRowChanged(const oldCurrentRow : integer);
 
     procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
@@ -67,8 +71,8 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MouseLeave;
 
 
-    procedure DoLineUp;
-    procedure DoLineDown;
+    procedure DoLineUp(const fromScrollBar : boolean);
+    procedure DoLineDown(const fromScrollBar : boolean);
     procedure DoPageUp(const fromScrollBar : boolean; const newScrollPostition : integer);
     procedure DoPageDown(const fromScrollBar : boolean; const newScrollPostition : integer);
     procedure DoGoTop;
@@ -82,7 +86,7 @@ type
     procedure SetRows(const Value: Int64);
     procedure SetRowHeight(const Value: integer);
 
-    function GetRowPaintState(const rowIdx : integer) : TPaintRowState;
+    function GetRowPaintState(const rowIdx : Int64) : TPaintRowState;
 
 
     procedure DoOnPaintRow(const itemRect : TRect; const index : Int64; const state : TPaintRowState);
@@ -109,6 +113,7 @@ type
     destructor Destroy;override;
     class constructor Create;
     procedure InvalidateRow(const index : Int64);
+    property CurrentRow : Int64 read FCurrentRow;
   published
     property Align;
     property Anchors;
@@ -176,13 +181,13 @@ var
   oldHoverRow : integer;
   rowState : TPaintRowState;
 begin
-  oldHoverRow := FHoverRow;
-  FHoverRow := -1;
-  if (oldHoverRow <> -1) and (oldHoverRow < FVisibleRows)  and (oldHoverRow < FRowCount) and ((oldHoverRow + FTopRow) < FRowCount) then
-  begin
-    rowState := GetRowPaintState(oldHoverRow);
-    DoOnPaintRow(FRowRects[oldHoverRow], FTopRow + oldHoverRow, rowState);
-  end;
+//  oldHoverRow := FHoverRow;
+//  FHoverRow := -1;
+//  if (oldHoverRow <> -1) and (oldHoverRow < FVisibleRows)  and (oldHoverRow < FRowCount) and ((oldHoverRow + FTopRow) < FRowCount) then
+//  begin
+//    rowState := GetRowPaintState(oldHoverRow);
+//    DoOnPaintRow(FRowRects[oldHoverRow], FTopRow + oldHoverRow, rowState);
+//  end;
   inherited;
 end;
 
@@ -247,11 +252,11 @@ var
   scrollPos : integer;
 begin
   result := true;
-  if FRowCount = 0 then
-    exit;
-
-  scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
-  ScrollBarScroll(Self,TScrollCode.scLineDown, scrollPos );
+//  if FRowCount = 0 then
+//    exit;
+//
+//  scrollPos := Min(FScrollPos + 1, FRowCount - 1) ;
+//  ScrollBarScroll(Self,TScrollCode.scLineDown, scrollPos );
 end;
 
 function TVSoftVirtualListView.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean;
@@ -259,11 +264,11 @@ var
   scrollPos : integer;
 begin
   result := true;
-  if FRowCount = 0 then
-    exit;
-
-  scrollPos := Max(0, FScrollPos - 1);
-  ScrollBarScroll(Self,TScrollCode.scLineUp, scrollPos );
+//  if FRowCount = 0 then
+//    exit;
+//
+//  scrollPos := Max(0, FScrollPos - 1);
+//  ScrollBarScroll(Self,TScrollCode.scLineUp, scrollPos );
 end;
 
 procedure TVSoftVirtualListView.DoOnPaintRow(const itemRect: TRect; const index: Int64; const state: TPaintRowState);
@@ -277,7 +282,7 @@ begin
   end;
 end;
 
-procedure TVSoftVirtualListView.DoRowChanged(const oldTopRow, oldCurrentRow : integer);
+procedure TVSoftVirtualListView.DoRowChanged(const oldCurrentRow : integer);
 var
   oldIdx : integer;
   newIdx : integer;
@@ -290,9 +295,7 @@ begin
   if not Assigned(FOnRowChangeEvent) then
     exit;
 
-  oldIdx := oldTopRow + oldCurrentRow;
-  newIdx := FTopRow + FCurrentRow;
-  delta := newIdx - oldIdx;
+  delta := FCurrentRow - oldCurrentRow;
   if delta = 0 then
     exit
   else if delta < 0 then
@@ -300,7 +303,7 @@ begin
   else
     direction := TScrollDirection.sdDown;
 
-  FOnRowChangeEvent(Self,FTopRow + FCurrentRow, direction, delta);
+  FOnRowChangeEvent(Self,FCurrentRow, direction, delta);
 end;
 
 procedure TVSoftVirtualListView.DoTrack(const newScrollPostition: integer);
@@ -309,21 +312,21 @@ var
   oldCurrentRow : integer;
   delta : integer;
 begin
-  oldTopRow := FTopRow;
-  oldCurrentRow := FCurrentRow;
-  FTopRow := newScrollPostition;
-  delta := FTopRow - oldTopRow;
-  if delta <> 0 then
-  begin
-    if delta > 0 then //scrolling down
-      FCurrentRow := Max(0, oldCurrentRow - delta)
-    else
-      FCurrentRow := Min(FSelectableRows -1, oldCurrentRow - delta);
-
-
-    Invalidate;
-    DoRowChanged(oldTopRow, oldCurrentRow);
-  end;
+//  oldTopRow := FTopRow;
+//  oldCurrentRow := FCurrentRow;
+//  FTopRow := newScrollPostition;
+//  delta := FTopRow - oldTopRow;
+//  if delta <> 0 then
+//  begin
+//    if delta > 0 then //scrolling down
+//      FCurrentRow := Max(0, oldCurrentRow - delta)
+//    else
+//      FCurrentRow := Min(FSelectableRows -1, oldCurrentRow - delta);
+//
+//
+//    Invalidate;
+//    DoRowChanged(oldCurrentRow);
+//  end;
 
 
 end;
@@ -331,27 +334,41 @@ end;
 function TVSoftVirtualListView.GetRowFromY(const Y: integer): integer;
 begin
   result := (Y div FRowHeight); //this is probably not quite right.
-
 end;
 
-function TVSoftVirtualListView.GetRowPaintState(const rowIdx: integer): TPaintRowState;
+function TVSoftVirtualListView.GetRowPaintState(const rowIdx: Int64): TPaintRowState;
 begin
   if Self.Focused then
   begin
     result := rsFocusedNormal;
-    if (rowIdx = FCurrentRow) then
-      result := rsFocusedSelected
-    else if rowIdx = FHoverRow then
-      result := rsFocusedHot;
+    if RowInView(rowIdx) then
+    begin
+      if (rowIdx = FCurrentRow) then
+        result := rsFocusedSelected
+      else if rowIdx = FTopRow + FHoverRow then
+        result := rsFocusedHot;
+    end;
   end
   else
   begin
     result := rsNormal;
-    if (rowIdx = FCurrentRow) then
-      result := rsSelected
-    else if rowIdx = FHoverRow then
-      result := rsHot;
+    if RowInview(rowIdx) then
+    begin
+      if (rowIdx = FCurrentRow) then
+        result := rsSelected
+      else if rowIdx = FTopRow + FHoverRow then
+        result := rsHot;
+    end;
   end;
+end;
+
+function TVSoftVirtualListView.GetViewRow(const row: Int64): integer;
+begin
+  result := row - FTopRow;
+  if result < 0 then
+    result := 0;
+  if result > FVisibleRows -1 then
+    result := FVisibleRows -1;
 end;
 
 procedure TVSoftVirtualListView.InvalidateRow(const index: Int64);
@@ -361,13 +378,13 @@ begin
   //work out if the row is actually visible;
   if FRowCount = 0 then
     exit;
-  if (index < 0) or (index > FRowCount) then
+  if (index < 0) or (index > FRowCount -1) then
     exit;
 
   if (index >= FTopRow) and (index < FTopRow + FVisibleRows) then
   begin
-    rowState := GetRowPaintState(index - FTopRow);
-    DoOnPaintRow(FRowRects[index - FTopRow], index, rowState);
+    rowState := GetRowPaintState(index);
+    DoOnPaintRow(FRowRects[GetViewRow(index)], index, rowState);
   end;
 end;
 
@@ -375,8 +392,8 @@ procedure TVSoftVirtualListView.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   inherited;
   case Key of
-    VK_UP,VK_LEFT: DoLineUp;
-    VK_DOWN, VK_RIGHT: DoLineDown;
+    VK_UP,VK_LEFT: DoLineUp(false);
+    VK_DOWN, VK_RIGHT: DoLineDown(false);
     VK_NEXT: DoPageDown(false,0);
     VK_PRIOR: DoPageUp(false, 0);
     VK_HOME: DoGoTop;
@@ -394,12 +411,16 @@ begin
   if FRowCount = 0 then
     exit;
   row := GetRowFromY(Y);
-  if  row <> FCurrentRow then
+  if (row > FVisibleRows) or (row >= FRowCount) then
+    exit;
+
+  if FTopRow + row <> FCurrentRow then
   begin
     oldRow := FCurrentRow;
-    FCurrentRow := row;
-    DoRowChanged(FTopRow, oldRow);
+    FCurrentRow := FTopRow + row;
+    DoRowChanged(oldRow);
     Invalidate;
+    UpdateScrollBar;
   end;
 
 end;
@@ -411,22 +432,22 @@ var
   rowState : TPaintRowState;
 begin
   inherited;
-  row := GetRowFromY(Y);
-  if row <> FHoverRow then
-  begin
-    oldHoverRow := FHoverRow;
-    FHoverRow := row;
-    if (oldHoverRow <> -1) and (oldHoverRow < FVisibleRows)  and (oldHoverRow < FRowCount) and ((oldHoverRow + FTopRow) < FRowCount) then
-    begin
-      rowState := GetRowPaintState(oldHoverRow);
-      DoOnPaintRow(FRowRects[oldHoverRow], FTopRow + oldHoverRow, rowState);
-    end;
-    if (FHoverRow > -1) and (FHoverRow < FVisibleRows ) and (FHoverRow < FRowCount) and ((FHoverRow + FTopRow) < FRowCount)  then
-    begin
-      rowState := GetRowPaintState(FHoverRow);
-      DoOnPaintRow(FRowRects[FHoverRow], FTopRow + FHoverRow , rowState);
-    end
-  end;
+//  row := GetRowFromY(Y);
+//  if row <> FHoverRow then
+//  begin
+//    oldHoverRow := FHoverRow;
+//    FHoverRow := row;
+//    if (oldHoverRow <> -1) and (oldHoverRow < FVisibleRows)  and (oldHoverRow < FRowCount) and ((oldHoverRow + FTopRow) < FRowCount) then
+//    begin
+//      rowState := GetRowPaintState(oldHoverRow);
+//      DoOnPaintRow(FRowRects[oldHoverRow], FTopRow + oldHoverRow, rowState);
+//    end;
+//    if (FHoverRow > -1) and (FHoverRow < FVisibleRows ) and (FHoverRow < FRowCount) and ((FHoverRow + FTopRow) < FRowCount)  then
+//    begin
+//      rowState := GetRowPaintState(FHoverRow);
+//      DoOnPaintRow(FRowRects[FHoverRow], FTopRow + FHoverRow , rowState);
+//    end
+//  end;
 end;
 
 
@@ -481,9 +502,7 @@ begin
         if rowIdx >= FRowCount then
           exit;
         r := FRowRects[i];
-
-        rowState := GetRowPaintState(i);
-
+        rowState := GetRowPaintState(rowIdx);
         FOnPaintRow(Self, LCanvas, r, rowIdx, rowState);
       end;
     end;
@@ -536,15 +555,20 @@ begin
     SendMessage(Handle, WM_NCPAINT, 0, 0);
 
   if (oldTopRow <> FTopRow) or (oldCurrentRow <> FCurrentRow) then
-    DoRowChanged(oldCurrentRow, oldCurrentRow);
+    DoRowChanged(oldCurrentRow);
 
+end;
+
+function TVSoftVirtualListView.RowInView(const row: Int64): boolean;
+begin
+  result := (row >= FTopRow) and (row <= (FTopRow + FSelectableRows));
 end;
 
 procedure TVSoftVirtualListView.ScrollBarScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 begin
   case scrollCode of
-    TScrollCode.scLineUp: DoLineUp;
-    TScrollCode.scLineDown: DoLineDown;
+    TScrollCode.scLineUp: DoLineUp(true);
+    TScrollCode.scLineDown: DoLineDown(true);
     TScrollCode.scPageUp:
     begin
       ScrollPos :=  FScrollPos - FSelectableRows;
@@ -570,7 +594,7 @@ begin
   end;
 end;
 
-procedure TVSoftVirtualListView.DoLineDown;
+procedure TVSoftVirtualListView.DoLineDown(const fromScrollBar : boolean);
 var
   oldCurrentRow : integer;
   oldTopRow : integer;
@@ -580,39 +604,103 @@ begin
   if FRowCount = 0 then
     exit;
 
-
   oldCurrentRow := FCurrentRow;
   oldTopRow := FTopRow;
-  if (FCurrentRow < FSelectableRows - 1) and (FCurrentRow < FRowCount -1) then
+
+  //behavior depends on whether we are using the keyboard or the mouse on the scrollbar.
+  //when we use the scrollbar, the current row doesn't change, we just scroll the view.
+
+  if fromScrollBar then
   begin
-    //easy.
-    Inc(FCurrentRow);
-    //there may not have been a current row before.
-    if oldCurrentRow >= 0 then
-    begin
-      rowState := GetRowPaintState(oldCurrentRow);
-      DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
-    end;
-    rowState := GetRowPaintState(FCurrentRow);
-    DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+    if (FTopRow + FSelectableRows) <  (FRowCount -1) then
+      Inc(FTopRow)
+    else
+      exit;
+    FScrollPos := FTopRow;
+    //we scrolled so full paint.
+    Invalidate;
+    UpdateScrollBar;
   end
-  else if FRowCount > FSelectableRows then
+  else //from keyboard
   begin
-    //more complicated.
-    pageSize := Min(FSelectableRows, FRowCount -1);
-    FTopRow := Min(FTopRow + 1,FRowCount - pageSize);
-    if oldTopRow <> FTopRow then
+    if RowInView(FCurrentRow) then
     begin
-       //full paint.
-       Invalidate;
+      //if the currentRow is visible, then we can try to move the current row if it's not at the bottom.
+      if (FCurrentRow - FTopRow < FSelectableRows - 1) then
+      begin
+        Inc(FCurrentRow);
+        //no scrolling required so just paint the affected rows.
+        //there may not have been a current row before.
+        if (oldCurrentRow >= 0) and RowInView(oldCurrentRow) then
+        begin
+          rowState := GetRowPaintState(oldCurrentRow);
+          DoOnPaintRow(FRowRects[GetViewRow(oldCurrentRow)], oldCurrentRow , rowState);
+        end;
+        rowState := GetRowPaintState(FCurrentRow);
+        DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
+        DoRowChanged(oldCurrentRow);
+        FScrollPos := FTopRow;
+        UpdateScrollBar;
+      end
+      else
+      begin
+        //Current Row isn't in the view, so we will need a full paint
+        if FCurrentRow < FRowCount -1 then
+        begin
+          Inc(FCurrentRow);
+          Inc(FTopRow);
+          FScrollPos := FTopRow;
+          DoRowChanged(oldCurrentRow);
+          Invalidate;
+          UpdateScrollBar;
+        end;
+      end;
+    end
+    else
+    begin
+      if FCurrentRow < FRowCount -1 then
+      begin
+        Inc(FCurrentRow);
+        FTopRow := FCurrentRow;
+        FScrollPos := FTopRow;
+        DoRowChanged(oldCurrentRow);
+        Invalidate;
+        UpdateScrollBar;
+      end;
     end;
   end;
-  DoRowChanged(oldTopRow, oldCurrentRow);
 
-  FScrollPos := FTopRow;
-//  if FVertScrollBar.Visible then
-//    FVertScrollBar.Position := FTopRow;
-  UpdateScrollBar;
+
+//
+//
+//  if (FCurrentRow < FSelectableRows - 1) and (FCurrentRow < FRowCount -1) then
+//  begin
+//    //easy.
+//    Inc(FCurrentRow);
+//    //there may not have been a current row before.
+//    if oldCurrentRow >= 0 then
+//    begin
+//      rowState := GetRowPaintState(oldCurrentRow);
+//      DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
+//    end;
+//    rowState := GetRowPaintState(FCurrentRow);
+//    DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+//  end
+//  else if FRowCount > FSelectableRows then
+//  begin
+//    //more complicated.
+//    pageSize := Min(FSelectableRows, FRowCount -1);
+//    FTopRow := Min(FTopRow + 1,FRowCount - pageSize);
+//    if oldTopRow <> FTopRow then
+//    begin
+//       //full paint.
+//       Invalidate;
+//    end;
+//  end;
+//  DoRowChanged(oldTopRow, oldCurrentRow);
+//
+//  FScrollPos := FTopRow;
+//  UpdateScrollBar;
 end;
 
 procedure TVSoftVirtualListView.DoPageDown(const fromScrollBar : boolean; const newScrollPostition : integer);
@@ -627,60 +715,103 @@ begin
   if FRowCount = 0 then
     exit;
 
+  exit;
+
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
   fullRepaint := false;
   delta := 0;
-  if fromScrollBar then
+
+  if fromScrollBar  then
   begin
+    //we do not change current row here.
     FTopRow := newScrollPostition;
     if FTopRow > (FRowCount - FSelectableRows) then
       FTopRow := FRowCount - FSelectableRows;
-    FCurrentRow := FSelectableRows - 1;
     if oldTopRow <> FTopRow then
     begin
       delta := FTopRow - oldTopRow;
       fullRepaint := true;
     end
-    else if oldCurrentRow <> FCurrentRow then
-      delta := FCurrentRow  - oldCurrentRow;
+
+
   end
   else
-  begin
-    if FCurrentRow < FSelectableRows - 1 then
-    begin
-      FCurrentRow := FSelectableRows -1;
-      delta := FCurrentRow  - oldCurrentRow;
-    end
-    else if FRowCount > FSelectableRows then
-    begin
-      pageSize := Min(FSelectableRows, FRowCount -1);
-      FTopRow := Min(FTopRow + pageSize, FRowCount - pageSize);
-      if oldTopRow <> FTopRow then
-      begin
-         delta := FTopRow - oldTopRow;
-         fullRepaint := true;
-      end;
-    end;
+  begin //from keyboard
+
+
+
   end;
   if delta > 0 then
   begin
     if not fullRepaint then
     begin
       rowState := GetRowPaintState(oldCurrentRow);
-      DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
+      DoOnPaintRow(FRowRects[GetViewRow(oldCurrentRow)], oldCurrentRow, rowState);
       rowState := GetRowPaintState(FCurrentRow);
-      DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+      DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
     end
     else
       Invalidate;
 
-    DoRowChanged(oldTopRow, oldCurrentRow);
+    DoRowChanged(oldCurrentRow);
 //    if FVertScrollBar.Visible then
 //      FVertScrollBar.Position := FTopRow;
     FScrollPos := FTopRow;
     UpdateScrollBar;
   end;
+
+
+//  if fromScrollBar then
+//  begin
+//    FTopRow := newScrollPostition;
+//    if FTopRow > (FRowCount - FSelectableRows) then
+//      FTopRow := FRowCount - FSelectableRows;
+//    FCurrentRow := FSelectableRows - 1;
+//    if oldTopRow <> FTopRow then
+//    begin
+//      delta := FTopRow - oldTopRow;
+//      fullRepaint := true;
+//    end
+//    else if oldCurrentRow <> FCurrentRow then
+//      delta := FCurrentRow  - oldCurrentRow;
+//  end
+//  else
+//  begin
+//    if FCurrentRow < FSelectableRows - 1 then
+//    begin
+//      FCurrentRow := FSelectableRows -1;
+//      delta := FCurrentRow  - oldCurrentRow;
+//    end
+//    else if FRowCount > FSelectableRows then
+//    begin
+//      pageSize := Min(FSelectableRows, FRowCount -1);
+//      FTopRow := Min(FTopRow + pageSize, FRowCount - pageSize);
+//      if oldTopRow <> FTopRow then
+//      begin
+//         delta := FTopRow - oldTopRow;
+//         fullRepaint := true;
+//      end;
+//    end;
+//  end;
+//  if delta > 0 then
+//  begin
+//    if not fullRepaint then
+//    begin
+//      rowState := GetRowPaintState(oldCurrentRow);
+//      DoOnPaintRow(FRowRects[oldCurrentRow], FTopRow + oldCurrentRow, rowState);
+//      rowState := GetRowPaintState(FCurrentRow);
+//      DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+//    end
+//    else
+//      Invalidate;
+//
+//    DoRowChanged(oldCurrentRow);
+////    if FVertScrollBar.Visible then
+////      FVertScrollBar.Position := FTopRow;
+//    FScrollPos := FTopRow;
+//    UpdateScrollBar;
+//  end;
 
 end;
 
@@ -695,7 +826,7 @@ begin
 
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
-  FCurrentRow := FSelectableRows - 1;
+  FCurrentRow := FRowCount - 1;
   FTopRow := FRowCount - FSelectableRows;
   FScrollPos := FRowCount -1;
 
@@ -707,13 +838,11 @@ begin
   else if FCurrentRow <> oldCurrentRow then
   begin
     rowState := GetRowPaintState(oldCurrentRow);
-    DoOnPaintRow(FRowRects[oldCurrentRow], oldTopRow + oldCurrentRow, rowState);
+    DoOnPaintRow(FRowRects[GetViewRow(oldCurrentRow)], oldCurrentRow, rowState);
     rowState := GetRowPaintState(FCurrentRow);
-    DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+    DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
   end;
-  DoRowChanged(oldTopRow, oldCurrentRow);
-
-  //FVertScrollBar.Position := FVertScrollBar.Max;
+  DoRowChanged(oldCurrentRow);
   UpdateScrollBar;
 end;
 
@@ -747,14 +876,13 @@ begin
       FCurrentRow := 0;
       Invalidate;
     end;
-//    FVertScrollBar.Position := 0;
     FScrollPos := 0;
     UpdateScrollBar;
-    DoRowChanged(oldTopRow, oldCurrentRow);
+    DoRowChanged(oldCurrentRow);
   end;
 end;
 
-procedure TVSoftVirtualListView.DoLineUp;
+procedure TVSoftVirtualListView.DoLineUp(const fromScrollBar : boolean);
 var
   oldTopRow : integer;
   oldCurrentRow : integer;
@@ -765,24 +893,83 @@ begin
 
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
-  if FCurrentRow  > 0 then
-    Dec(FCurrentRow)
-  else if FTopRow > 0 then
-    Dec(FTopRow);
 
-  if FTopRow <> oldTopRow then
-    Invalidate
+  if fromScrollBar then
+  begin
+    if FTopRow > 0 then
+    begin
+      Dec(FTopRow);
+      FScrollPos := FTopRow;
+      //we scrolled so full paint.
+      Invalidate;
+      UpdateScrollBar;
+    end;
+  end
   else
   begin
-    rowState := GetRowPaintState(oldCurrentRow);
-    DoOnPaintRow(FRowRects[oldCurrentRow], oldTopRow + oldCurrentRow, rowState);
-    rowState := GetRowPaintState(FCurrentRow);
-    DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+    if RowInView(FCurrentRow) then
+    begin
+      //if the currentRow is visible, then we can try to move the current row if it's not at the bottom.
+      if  ((FCurrentRow - FTopRow ) > 0) then
+      begin
+        Dec(FCurrentRow);
+        //no scrolling required so just paint the affected rows.
+        //there may not have been a current row before.
+        if (oldCurrentRow >= 0) and RowInView(oldCurrentRow) then
+        begin
+          rowState := GetRowPaintState(oldCurrentRow);
+          DoOnPaintRow(FRowRects[GetViewRow(oldCurrentRow)], oldCurrentRow , rowState);
+        end;
+        rowState := GetRowPaintState(FCurrentRow);
+        DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
+        DoRowChanged(oldCurrentRow);
+        FScrollPos := FTopRow;
+        UpdateScrollBar;
+      end
+      else
+      begin
+        //Current Row isn't in the view, so we will need a full paint
+        if (FCurrentRow > 0) and (FTopRow > 0) then
+        begin
+          Dec(FCurrentRow);
+          Dec(FTopRow);
+          FScrollPos := FTopRow;
+          DoRowChanged(oldCurrentRow);
+          Invalidate;
+          UpdateScrollBar;
+        end;
+      end;
+    end
+    else
+    begin
+      if FCurrentRow > 0 then
+      begin
+        Dec(FCurrentRow);
+        if FCurrentRow < FTopRow then
+          FTopRow := FCurrentRow
+        else
+          FTopRow := Max(FCurrentRow - FSelectableRows - 1, 0);
+        FScrollPos := FTopRow;
+        DoRowChanged(oldCurrentRow);
+        Invalidate;
+        UpdateScrollBar;
+      end;
+    end;
+
   end;
-  FScrollPos := FTopRow;
-//  FVertScrollBar.Position := FTopRow;
-  UpdateScrollBar;
-  DoRowChanged(oldTopRow, oldCurrentRow);
+//
+//  if FTopRow <> oldTopRow then
+//    Invalidate
+//  else
+//  begin
+//    rowState := GetRowPaintState(oldCurrentRow);
+//    DoOnPaintRow(FRowRects[oldCurrentRow], oldTopRow + oldCurrentRow, rowState);
+//    rowState := GetRowPaintState(FCurrentRow);
+//    DoOnPaintRow(FRowRects[FCurrentRow], FTopRow + FCurrentRow , rowState);
+//  end;
+//  FScrollPos := FTopRow;
+//  UpdateScrollBar;
+//  DoRowChanged(oldCurrentRow);
 end;
 
 procedure TVSoftVirtualListView.DoPageUp(const fromScrollBar : boolean; const newScrollPostition : integer);
@@ -845,9 +1032,7 @@ begin
     else
       Invalidate;
 
-    DoRowChanged(oldTopRow, oldCurrentRow);
-//    if FVertScrollBar.Visible then
-//      FVertScrollBar.Position := FTopRow;
+    DoRowChanged(oldCurrentRow);
     FScrollPos := FTopRow;
     UpdateScrollBar;
   end;
@@ -944,7 +1129,7 @@ begin
   if HandleAllocated then
   begin
     FVisibleRows :=  ClientHeight div RowHeight;
-    FSelectableRows := FVisibleRows; //the number of full rows
+    FSelectableRows := Min(FVisibleRows, FRowCount); //the number of full rows
     if (FRowCount > FVisibleRows) and (ClientHeight mod RowHeight > 0) then
     begin
       //add 1 to ensure a partial row is painted.

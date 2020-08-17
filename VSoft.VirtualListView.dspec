@@ -90,6 +90,7 @@
          ]
       },
       {
+         "comment" : "note all paths are relative to the dspec file location",
          "name":"default",
          "source":[
             {
@@ -138,12 +139,16 @@
               "dcpOutputDir" : "lib"
             },
             {
+              "comment" : "design time package",
               "id" : "VirtualListViewD$libsuffix$.bpl",
               "project" : "packages\\Rad Studio $compiler$\\VSoft.VirtualListViewD.dproj",
               "configuration" : "Release",
               "bplOutputDir" : "bin",
-              "dcuOutputDir" : "lib",
-              "dcpOutputDir" : "lib"
+              "dcuOutputDir" : ".",
+              "dcpOutputDir" : ".",
+              "comment2" : "where to find the runtime dcp",
+              "comment3" : "other dependency searchPaths will be added automatically",
+              "searchPath" : "lib"
             }
          ]
       }

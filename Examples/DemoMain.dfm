@@ -39,6 +39,13 @@ object Form2: TForm2
       Height = 13
       Caption = 'Label1'
     end
+    object Label2: TLabel
+      Left = 32
+      Top = 64
+      Width = 31
+      Height = 13
+      Caption = 'Label2'
+    end
     object Button1: TButton
       Left = 17
       Top = 112
@@ -53,7 +60,7 @@ object Form2: TForm2
       Top = 112
       Width = 75
       Height = 25
-      Caption = '1500 Rows'
+      Caption = '200 Rows'
       TabOrder = 1
       OnClick = Button2Click
     end

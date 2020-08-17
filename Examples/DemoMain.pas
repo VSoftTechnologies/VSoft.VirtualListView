@@ -15,6 +15,7 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
+    Label2: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -49,7 +50,7 @@ end;
 
 procedure TForm2.Button2Click(Sender: TObject);
 begin
-  FVirtualListView.RowCount := 1500;
+  FVirtualListView.RowCount := 200;
 end;
 
 procedure TForm2.Button3Click(Sender: TObject);
@@ -68,7 +69,7 @@ begin
   FVirtualListView.BevelKind := TBevelKind.bkFlat;
   FVirtualListView.DoubleBuffered := true;
   FVirtualListView.RowHeight := 80;
-  FVirtualListView.RowCount := 1500;
+  FVirtualListView.RowCount := 4;
   FVirtualListView.OnPaintRow := Self.PaintRow;
   FVirtualListView.OnPaintNoRows := Self.PaintNoRows;
   FVirtualListView.OnRowChange := Self.RowChanged;
@@ -140,6 +141,7 @@ end;
 procedure TForm2.RowChanged(const Sender: TObject; const newRowIndex: Int64; const direction: TScrollDirection; const delta: Int64);
 begin
    Label1.Caption := 'Row : ' + IntToStr(newRowIndex) + ' Delta : ' + IntToStr(delta) ;
+   Label2.Caption := 'Current Row : ' + IntToStr(FVirtualListView.CurrentRow);
 end;
 
 end.
