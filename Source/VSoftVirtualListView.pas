@@ -118,6 +118,7 @@ type
     class constructor Create;
     procedure InvalidateRow(const index : Int64);
     property CurrentRow : Int64 read FCurrentRow;
+    property TopRow : Int64 read FTopRow;
   published
     property Align;
     property Anchors;
