@@ -74,4 +74,23 @@ object Form2: TForm2
       OnClick = Button3Click
     end
   end
+  object VListView: TVSoftVirtualListView
+    Left = 0
+    Top = 0
+    Width = 484
+    Height = 411
+    Align = alClient
+    BevelInner = bvNone
+    BevelKind = bkFlat
+    BorderStyle = bsNone
+    DoubleBuffered = True
+    ParentBackground = True
+    ParentDoubleBuffered = False
+    TabOrder = 1
+    RowCount = 0
+    RowHeight = 80
+    OnPaintRow = VListViewPaintRow
+    OnPaintNoRows = VListViewPaintNoRows
+    OnRowChange = VListViewRowChange
+  end
 end

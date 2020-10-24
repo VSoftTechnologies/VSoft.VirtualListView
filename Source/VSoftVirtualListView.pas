@@ -117,6 +117,7 @@ type
     constructor Create(AOwner : TComponent);override;
     destructor Destroy;override;
     class constructor Create;
+    class destructor Destroy;
     procedure InvalidateRow(const index : Int64);
     property CurrentRow : Int64 read FCurrentRow write SetCurrentRow;
     property TopRow : Int64 read FTopRow;
@@ -130,11 +131,13 @@ type
     property BevelWidth;
     property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
     property Color default clWindow;
+    property DoubleBuffered;
     property Enabled;
     property Font;
     property Height default 100;
     property ParentBackground;
     property ParentColor;
+    property ParentDoubleBuffered;
     {$IF CompilerVersion >= 24.0}
       {$LEGACYIFEND ON}
     property StyleElements;
@@ -732,6 +735,11 @@ begin
   end;
 end;
 
+class destructor TVSoftVirtualListView.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TVSoftVirtualListView, TScrollingStyleHook);
+end;
+
 procedure TVSoftVirtualListView.DoGoBottom;
 var
   oldTopRow : integer;
@@ -1007,10 +1015,13 @@ begin
       FHoverRow := -1;
     end;
 
-    if HandleAllocated then
+    if not (csDesigning in ComponentState) then
     begin
-      UpdateVisibleRows;
-      Invalidate;
+      if HandleAllocated then
+      begin
+        UpdateVisibleRows;
+        Invalidate;
+      end;
     end;
   end;
 end;
