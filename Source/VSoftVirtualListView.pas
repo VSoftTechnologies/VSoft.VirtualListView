@@ -49,6 +49,7 @@ type
     FScrollPos : Int64;
     FScrollBarVisible : boolean;
     procedure SetBorderStyle(const Value: TBorderStyle);
+    procedure SetCurrentRow(const Value: Int64);
 
   protected
     procedure AdjustClientRect(var Rect: TRect); override;
@@ -117,7 +118,7 @@ type
     destructor Destroy;override;
     class constructor Create;
     procedure InvalidateRow(const index : Int64);
-    property CurrentRow : Int64 read FCurrentRow;
+    property CurrentRow : Int64 read FCurrentRow write SetCurrentRow;
     property TopRow : Int64 read FTopRow;
   published
     property Align;
@@ -134,7 +135,10 @@ type
     property Height default 100;
     property ParentBackground;
     property ParentColor;
+    {$IF CompilerVersion >= 24.0}
+      {$LEGACYIFEND ON}
     property StyleElements;
+    {$IFEND}
     property TabOrder;
     property TabStop default True;
     property Width default 100;
@@ -455,7 +459,7 @@ var
 begin
   Buffer := nil;
   try
-    if not DoubleBuffered and TStyleManager.IsCustomStyleActive and (seClient in StyleElements) then
+    if not DoubleBuffered and TStyleManager.IsCustomStyleActive {$IF CompilerVersion >= 24.0} and (seClient in StyleElements) {$IFEND} then
     begin
       Buffer := TBitmap.Create;
       Buffer.SetSize(ClientWidth, ClientHeight);
@@ -466,7 +470,7 @@ begin
 
     LStyle := StyleServices;
 
-    if LStyle.Enabled and (seClient in StyleElements) then
+    if LStyle.Enabled {$IF CompilerVersion >= 24.0} and (seClient in StyleElements) {$IFEND} then
     begin
       LDetails := LStyle.GetElementDetails(tpPanelBackground);
       if not LStyle.GetElementColor(LDetails, ecFillColor, LColor) or (LColor = clNone) then
@@ -960,6 +964,19 @@ begin
   begin
     FBorderStyle := Value;
     RecreateWnd;
+  end;
+end;
+
+procedure TVSoftVirtualListView.SetCurrentRow(const Value: Int64);
+var
+  oldRow : Int64;
+begin
+  if (FCurrentRow <> Value) and (Value < FRowCount) then
+  begin
+    oldRow := FCurrentRow;
+    FCurrentRow := Value;
+    DoRowChanged(oldRow);
+    Invalidate; //do full repaint
   end;
 end;
 

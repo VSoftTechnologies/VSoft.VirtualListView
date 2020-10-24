@@ -1,7 +1,7 @@
 {
    "metadata":{
       "id":"VSoft.VirtualListView",
-      "version":"0.0.2-beta1",
+      "version":"0.1.0-rc1",
       "description":"Owner drawn VCL Virtual List View",
       "owners":"VSoft Technologies Pty Ltd",
       "authors":"Vincent Parrett",
@@ -14,27 +14,27 @@
       {
          "compiler":"XE2",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"XE3",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"XE4",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"XE5",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"XE6",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"XE7",
@@ -44,51 +44,35 @@
       {
          "compiler":"XE8",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"10.0",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"10.1",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"10.2",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"10.3",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       },
       {
          "compiler":"10.4",
          "platforms":"Win32, Win64",
-         "template":"noPackages"
+         "template":"default"
       }
    ],
    "templates":[
-      {
-        "comment" : "just a placeholder until we can create packages for the other platforms",
-        "name" : "noPackages",
-         "source":[
-            {
-               "src":"source\\*.pas",
-               "flatten":true,
-               "dest":"Source"
-            }
-         ],
-         "searchPaths":[
-            {
-               "path":"Source"
-            }
-         ]
-      },
       {
          "comment" : "note all paths are relative to the dspec file location",
          "name":"default",
@@ -99,9 +83,9 @@
                "dest":"Source"
             },
             {
-             "src":"packages\\Rad Studio $compiler$\\*.dp*",
+             "src":"packages\\Rad Studio $CompilerWithCodeName$\\*.dp*",
              "exclude": ["*.dproj.local"],
-             "dest":"packages\\Rad Studio $compiler$"
+             "dest":"packages\\Rad Studio $CompilerWithCodeName$"
             }
          ],
          "searchPaths":[
@@ -114,7 +98,7 @@
          ],
          "runtime" : [
           {
-            "preBuilt": "false",
+            "buildId" : "VirtualListViewR$libsuffix$.bpl",
             "src" : "bin\\VirtualListViewR$libsuffix$.bpl",
             "dest" : "bin",
             "copyLocal" : "true"
@@ -122,7 +106,7 @@
          ],
          "design" : [
           {
-            "preBuilt": "false",
+            "buildId" : "VirtualListViewD$libsuffix$.bpl",
             "src" : "bin\\VirtualListViewD$libsuffix$.bpl",
             "dest" : "bin",
             "install": "true"
@@ -132,7 +116,7 @@
             {
               "comment" : "The id links the package to the runtime or designtime entry",
               "id" : "VirtualListViewR$libsuffix$.bpl",
-              "project" : "packages\\Rad Studio $compiler$\\VSoft.VirtualListViewR.dproj",
+              "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
               "configuration" : "Release",
               "bplOutputDir" : "bin",
               "dcuOutputDir" : "lib",
@@ -141,7 +125,7 @@
             {
               "comment" : "design time package",
               "id" : "VirtualListViewD$libsuffix$.bpl",
-              "project" : "packages\\Rad Studio $compiler$\\VSoft.VirtualListViewD.dproj",
+              "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
               "configuration" : "Release",
               "bplOutputDir" : "bin",
               "dcuOutputDir" : ".",
