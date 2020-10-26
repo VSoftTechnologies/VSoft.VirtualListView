@@ -26,7 +26,7 @@ type
   TVSoftVirtualListView = class(TCustomControl)
   private
     FBorderStyle : TBorderStyle;
-
+    FPaintBmp : TBitmap;
     FOnPaintRow : TPaintRowEvent;
     FOnPaintNoRows : TPaintNoRowsEvent;
     FOnRowChangeEvent : TRowChangeEvent;
@@ -111,6 +111,8 @@ type
 
     function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): Boolean; override;
     function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
+    procedure Loaded; override;
+
 
 
   public
@@ -130,14 +132,13 @@ type
     property BevelKind;
     property BevelWidth;
     property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
+    property BorderWidth;
     property Color default clWindow;
-    property DoubleBuffered;
     property Enabled;
     property Font;
     property Height default 100;
     property ParentBackground;
     property ParentColor;
-    property ParentDoubleBuffered;
     {$IF CompilerVersion >= 24.0}
       {$LEGACYIFEND ON}
     property StyleElements;
@@ -206,6 +207,9 @@ end;
 constructor TVSoftVirtualListView.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FPaintBmp := TBitmap.Create;
+  FPaintBmp.PixelFormat := pf32bit;
+
   FBorderStyle := bsSingle;
   FScrollBarVisible := false;
   FRowRects := TList<TRect>.Create;
@@ -217,7 +221,8 @@ begin
   TabStop := true;
   ParentBackground := true;
   ParentColor := true;
-  ParentDoubleBuffered := true;
+  ParentDoubleBuffered := false;
+  DoubleBuffered := false;
 end;
 
 class constructor TVSoftVirtualListView.Create;
@@ -255,6 +260,7 @@ end;
 destructor TVSoftVirtualListView.Destroy;
 begin
   FRowRects.Free;
+  FPaintBmp.Free;
   inherited;
 end;
 
@@ -296,7 +302,10 @@ begin
 //    Canvas.Brush.Color := StyleServices.GetSystemColor(clWindow);
 //    Canvas.FillRect(itemRect);
     if Assigned(FOnPaintRow) then
-      FOnPaintRow(Self, Canvas, itemRect, index, state);
+    begin
+      FOnPaintRow(Self, FPaintBmp.Canvas, itemRect, index, state);
+      Canvas.CopyRect(itemRect, FPaintBmp.Canvas, itemRect);
+    end;
   end;
 end;
 
@@ -416,6 +425,13 @@ begin
   end;
 end;
 
+procedure TVSoftVirtualListView.Loaded;
+begin
+  inherited;
+  // Set the bmp to the size of the control.
+  FPaintBmp.SetSize(Width, Height);
+end;
+
 procedure TVSoftVirtualListView.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   row : Integer;
@@ -455,35 +471,25 @@ var
 
   LCanvas : TCanvas;
   LStyle: TCustomStyleServices;
-  LDetails: TThemedElementDetails;
+//  LDetails: TThemedElementDetails;
   LColor : TColor;
   rowState : TPaintRowState;
-  buffer : TBitmap;
 begin
-  Buffer := nil;
-  try
-    if not DoubleBuffered and TStyleManager.IsCustomStyleActive {$IF CompilerVersion >= 24.0} and (seClient in StyleElements) {$IFEND} then
-    begin
-      Buffer := TBitmap.Create;
-      Buffer.SetSize(ClientWidth, ClientHeight);
-      LCanvas := Buffer.Canvas;
-    end
-    else
-      LCanvas := Canvas;
-
+    LCanvas := FPaintBmp.Canvas;
+    LCanvas.Font.Assign(Self.Font);
     LStyle := StyleServices;
 
     if LStyle.Enabled {$IF CompilerVersion >= 24.0} and (seClient in StyleElements) {$IFEND} then
     begin
-      LDetails := LStyle.GetElementDetails(tpPanelBackground);
-      if not LStyle.GetElementColor(LDetails, ecFillColor, LColor) or (LColor = clNone) then
-        LColor := Color;
+      LColor := LStyle.GetStyleColor(scWindow);// SystemColor(clWindow);
+//      LDetails := LStyle.GetElementDetails(tpPanelBackground);
+//      if not LStyle.GetElementColor(LDetails, ecFillColor, LColor) or (LColor = clNone) then
+//        LColor := Color;
     end
     else
       LColor := Color;
 
     r := GetClientRect;
-
     LCanvas.Brush.Style := bsSolid;
     LCanvas.Brush.Color := LColor;
     LCanvas.FillRect(r);
@@ -496,21 +502,15 @@ begin
       begin
         rowIdx := FTopRow + i;
         if rowIdx >= FRowCount then
-          exit;
+          break;
         r := FRowRects[i];
         rowState := GetRowPaintState(rowIdx);
         FOnPaintRow(Self, LCanvas, r, rowIdx, rowState);
       end;
     end;
 
-  finally
-    if Buffer <> nil then
-    begin
-      Canvas.Draw(0, 0, Buffer);
-      Buffer.Free;
-    end;
-
-  end;
+   Canvas.CopyRect(ClientRect, FPaintBmp.Canvas, ClientRect);
+   //Canvas.Draw(0, 0, FPaintBmp);
 end;
 
 
@@ -519,6 +519,7 @@ procedure TVSoftVirtualListView.Resize;
 var
   oldCurrentRow : integer;
   oldTopRow : integer;
+  NewWidth, NewHeight: integer;
 begin
   inherited;
   if (not HandleAllocated) then
@@ -526,6 +527,19 @@ begin
 
   if csDestroying in ComponentState then
     Exit;
+
+  NewWidth := Width;
+  NewHeight := Height;
+
+  if (NewWidth <> FPaintBmp.Width) or (NewHeight <> FPaintBmp.Height) then
+  begin
+    FPaintBmp.SetSize(0, 0);
+    // Width := 0; //TBitmap does some stuff to try and preserve contents
+    // FPaintBmp.Height := 0; // which slows things down a lot - this avoids that
+    FPaintBmp.Width := NewWidth;
+    FPaintBmp.Height := NewHeight;
+  end;
+
 
   oldTopRow := FTopRow;
   oldCurrentRow := FCurrentRow;
