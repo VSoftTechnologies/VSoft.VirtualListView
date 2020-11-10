@@ -120,6 +120,7 @@ type
     destructor Destroy;override;
     class constructor Create;
     class destructor Destroy;
+    procedure ScrollInView(const index : Int64);
     procedure InvalidateRow(const index : Int64);
     property CurrentRow : Int64 read FCurrentRow write SetCurrentRow;
     property TopRow : Int64 read FTopRow;
@@ -412,6 +413,7 @@ begin
   result := FScrollPos = 0;
 end;
 
+
 procedure TVSoftVirtualListView.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   inherited;
@@ -517,8 +519,6 @@ end;
 
 procedure TVSoftVirtualListView.Resize;
 var
-  oldCurrentRow : integer;
-  oldTopRow : integer;
   NewWidth, NewHeight: integer;
 begin
   inherited;
@@ -541,31 +541,16 @@ begin
   end;
 
 
-  oldTopRow := FTopRow;
-  oldCurrentRow := FCurrentRow;
 
   FHoverRow := -1;
-  UpdateVisibleRows;
+  UpdateVisibleRows; //<< Calls update scrollbars.. perhaps introduce an optional parameter to control this.
 
-  //make sure we show as much as possible
-  if FCurrentRow > FSelectableRows then
-    FCurrentRow := FSelectableRows;
-
-  if FScrollPos = FRowCount -1 then
-    FTopRow := Max(0, FRowCount - FSelectableRows)
-  else if (FVisibleRows = FRowCount) and (FTopRow > 0) then
-    FTopRow := 0
-  else if FTopRow > 0 then
-  begin
-    if FRowCount < FTopRow + FSelectableRows then
-       FTopRow := Max(0,FRowCount - FSelectableRows);
-  end;
+  if (FRowCount > 0) and (FCurrentRow > -1) then
+    if not RowInView(FCurrentRow) then
+      ScrollInView(FCurrentRow);
 
   if sfHandleMessages in StyleServices.Flags then
     SendMessage(Handle, WM_NCPAINT, 0, 0);
-
-  if (oldTopRow <> FTopRow) or (oldCurrentRow <> FCurrentRow) then
-    DoRowChanged(oldCurrentRow);
 
 end;
 
@@ -602,6 +587,25 @@ begin
     TScrollCode.scBottom: DoGoBottom;
     TScrollCode.scEndScroll: ;
   end;
+end;
+
+procedure TVSoftVirtualListView.ScrollInView(const index: Int64);
+var
+  position : integer;
+begin
+  if (FRowCount = 0) or (index > FRowCount -1) then
+    exit;
+
+  //Figure out what the top row should be to make the current row visible.
+  //current row below bottom of vieww
+  if index >= (FTopRow + FSelectableRows) then
+    FTopRow := Max(0, index - FSelectableRows + 1)
+  else //above
+    FTopRow := Min(index, FRowCount - FVisibleRows );
+
+  FScrollPos := FTopRow;
+  Invalidate;
+  UpdateScrollBar;
 end;
 
 procedure TVSoftVirtualListView.DoLineDown(const fromScrollBar : boolean);

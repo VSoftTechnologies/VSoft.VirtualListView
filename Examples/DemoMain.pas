@@ -17,6 +17,7 @@ type
     Button3: TButton;
     Label2: TLabel;
     VListView: TVSoftVirtualListView;
+    Button4: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -24,6 +25,7 @@ type
     procedure VListViewPaintNoRows(const Sender: TObject; const ACanvas: TCanvas; const paintRect: TRect);
     procedure VListViewPaintRow(const Sender: TObject; const ACanvas: TCanvas; const itemRect: TRect; const index: Int64; const state: TPaintRowState);
     procedure VListViewRowChange(const Sender: TObject; const newRowIndex: Int64; const direction: TScrollDirection; const delta: Int64);
+    procedure Button4Click(Sender: TObject);
   private
     FPackageName : string;
     FMouseWheeControl: TControl;
@@ -57,6 +59,11 @@ procedure TForm2.Button3Click(Sender: TObject);
 begin
   FPackageName := 'VSoft.DUnitX';
   VListView.InvalidateRow(4);
+end;
+
+procedure TForm2.Button4Click(Sender: TObject);
+begin
+  VListView.ScrollInView(VListView.CurrentRow);
 end;
 
 procedure TForm2.FormCreate(Sender: TObject);

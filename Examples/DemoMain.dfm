@@ -73,6 +73,15 @@ object Form2: TForm2
       TabOrder = 2
       OnClick = Button3Click
     end
+    object Button4: TButton
+      Left = 16
+      Top = 216
+      Width = 129
+      Height = 25
+      Caption = 'ScrollInView'
+      TabOrder = 3
+      OnClick = Button4Click
+    end
   end
   object VListView: TVSoftVirtualListView
     Left = 0
@@ -83,9 +92,7 @@ object Form2: TForm2
     BevelInner = bvNone
     BevelKind = bkFlat
     BorderStyle = bsNone
-    DoubleBuffered = True
     ParentBackground = True
-    ParentDoubleBuffered = False
     TabOrder = 1
     RowCount = 0
     RowHeight = 80
