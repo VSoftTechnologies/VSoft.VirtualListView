@@ -590,8 +590,6 @@ begin
 end;
 
 procedure TVSoftVirtualListView.ScrollInView(const index: Int64);
-var
-  position : integer;
 begin
   if (FRowCount = 0) or (index > FRowCount -1) then
     exit;
