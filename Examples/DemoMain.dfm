@@ -58,9 +58,9 @@ object Form2: TForm2
     object Button2: TButton
       Left = 137
       Top = 112
-      Width = 75
+      Width = 112
       Height = 25
-      Caption = '200 Rows'
+      Caption = '200000 Rows'
       TabOrder = 1
       OnClick = Button2Click
     end

@@ -52,7 +52,7 @@ end;
 
 procedure TForm2.Button2Click(Sender: TObject);
 begin
-  VListView.RowCount := 200;
+  VListView.RowCount := 200000;
 end;
 
 procedure TForm2.Button3Click(Sender: TObject);
@@ -136,7 +136,7 @@ begin
     ACanvas.TextOut(itemRect.Left + 3, itemRect.Top + 2, 'VSoft.Awaitable  ' + IntToStr(index) );
 
   ACanvas.Font.Size := oldSize;
-  ACanvas.TextOut(itemRect.Left + 150, itemRect.Top + 5, 'by Vincent Parrett');
+  ACanvas.TextOut(itemRect.Left + 175, itemRect.Top + 5, 'by Vincent Parrett');
   ACanvas.TextOut(itemRect.Left + 5, itemRect.Top + 20, 'This is Row : ' + IntToStr(index) + ' descriptions of some sort');
 
   if state in [rsFocusedSelected, rsSelected] then

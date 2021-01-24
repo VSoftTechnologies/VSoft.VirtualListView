@@ -1161,16 +1161,19 @@ end;
 
 procedure TVSoftVirtualListView.WMVScroll(var Message: TWMVScroll);
 var
-  p : Integer;
+  info : TScrollInfo;
 begin
   Message.Result := 0;
   with Message do
   begin
     if ScrollCode = 8 then
       exit;
-    p := pos;
-    Self.ScrollBarScroll(Self, TScrollCode(ScrollCode), p);
+    info.cbSize := SizeOf(TScrollInfo);
+    info.fMask := SIF_TRACKPOS;
+    GetScrollInfo(Self.Handle,SB_VERT, info);
+    Self.ScrollBarScroll(Self, TScrollCode(ScrollCode), info.nTrackPos);
   end;
+
 end;
 
 end.
