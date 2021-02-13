@@ -1,7 +1,7 @@
 {
    "metadata":{
       "id":"VSoft.VirtualListView",
-      "version":"0.2.2-rc5",
+      "version":"0.3.0-rc6",
       "description":"Owner drawn VCL Virtual List View",
       "owners":"VSoft Technologies Pty Ltd",
       "authors":"Vincent Parrett",
@@ -89,19 +89,16 @@
             }
          ],
          "searchPaths":[
-            {
-               "path" : "lib"
-            },
-            {
-               "path":"Source"
-            }
+          {
+             "path":"Source"
+          }
          ],
          "runtime" : [
           {
             "buildId" : "VirtualListViewR$libsuffix$.bpl",
             "src" : "bin\\VirtualListViewR$libsuffix$.bpl",
             "dest" : "bin",
-            "copyLocal" : "true"
+            "copyLocal" : true
           }
          ],
          "design" : [
@@ -109,7 +106,8 @@
             "buildId" : "VirtualListViewD$libsuffix$.bpl",
             "src" : "bin\\VirtualListViewD$libsuffix$.bpl",
             "dest" : "bin",
-            "install": "true"
+            "install": true,
+            "designOnly" : true
           }
          ],
          "build" : [
@@ -118,21 +116,16 @@
               "id" : "VirtualListViewR$libsuffix$.bpl",
               "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
               "configuration" : "Release",
-              "bplOutputDir" : "bin",
-              "dcuOutputDir" : "lib",
-              "dcpOutputDir" : "lib"
+              "buildForDesign": true,
+              "buildForDesignComment" : "when true, will build also win32 if the platform is not win32, so that other packages that need this for design will work"
             },
             {
               "comment" : "design time package",
               "id" : "VirtualListViewD$libsuffix$.bpl",
               "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
               "configuration" : "Release",
-              "bplOutputDir" : "bin",
-              "dcuOutputDir" : ".",
-              "dcpOutputDir" : ".",
-              "comment2" : "where to find the runtime dcp",
-              "comment3" : "other dependency searchPaths will be added automatically",
-              "searchPath" : "lib"
+              "designOnly" : true,
+              "designOnlyComment" : "designOnly forces compilation with win32 compiler"
             }
          ]
       }
