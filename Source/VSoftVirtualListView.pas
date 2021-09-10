@@ -113,8 +113,6 @@ type
     function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): Boolean; override;
     procedure Loaded; override;
 
-
-
   public
     constructor Create(AOwner : TComponent);override;
     destructor Destroy;override;

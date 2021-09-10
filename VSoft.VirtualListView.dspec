@@ -1,7 +1,7 @@
 {
    "metadata":{
       "id":"VSoft.VirtualListView",
-      "version":"0.3.0-rc6",
+      "version":"0.3.0-rc8",
       "description":"Owner drawn VCL Virtual List View",
       "owners":"VSoft Technologies Pty Ltd",
       "authors":"Vincent Parrett",
@@ -49,7 +49,7 @@
       {
          "compiler":"10.0",
          "platforms":"Win32, Win64",
-         "template":"default"
+         "template":"Seattle"
       },
       {
          "compiler":"10.1",
@@ -70,9 +70,67 @@
          "compiler":"10.4",
          "platforms":"Win32, Win64",
          "template":"default"
+      },
+      {
+         "compiler":"11",
+         "platforms":"Win32, Win64",
+         "template":"default"
       }
    ],
    "templates":[
+      {
+         "comment" : "Seattle not using 10.0",
+         "name":"Seattle",
+         "source":[
+            {
+               "src":"source\\*.pas",
+               "flatten":true,
+               "dest":"Source"
+            },
+            {
+             "src":"packages\\Rad Studio $CompilerWithCodeName$\\*.dp*",
+             "exclude": ["*.dproj.local"],
+             "dest":"packages\\Rad Studio $CompilerWithCodeName$"
+            }
+         ],
+         "searchPaths":[
+          {
+             "path":"Source"
+          }
+         ],
+         "runtime" : [
+          {
+            "buildId" : "VirtualListViewR$libsuffix$.bpl",
+            "src" : "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
+            "copyLocal" : true
+          }
+         ],
+         "design" : [
+          {
+            "buildId" : "VirtualListViewD$libsuffix$.bpl",
+            "src" : "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
+            "install": true
+          }
+         ],
+         "build" : [
+            {
+              "comment" : "The id links the package to the runtime or designtime entry",
+              "id" : "VirtualListViewR$libsuffix$.bpl",
+              "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
+              "configuration" : "Release",
+              "buildForDesign": true,
+              "buildForDesignComment" : "when true, will build also win32 if the platform is not win32, so that other packages that need this for design will work"
+            },
+            {
+              "comment" : "design time package",
+              "id" : "VirtualListViewD$libsuffix$.bpl",
+              "project" : "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
+              "configuration" : "Release",
+              "designOnly" : true,
+              "designOnlyComment" : "designOnly forces compilation with win32 compiler"
+            }
+         ]
+      },
       {
          "comment" : "note all paths are relative to the dspec file location",
          "name":"default",
@@ -96,18 +154,15 @@
          "runtime" : [
           {
             "buildId" : "VirtualListViewR$libsuffix$.bpl",
-            "src" : "bin\\VirtualListViewR$libsuffix$.bpl",
-            "dest" : "bin",
+            "src" : "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
             "copyLocal" : true
           }
          ],
          "design" : [
           {
             "buildId" : "VirtualListViewD$libsuffix$.bpl",
-            "src" : "bin\\VirtualListViewD$libsuffix$.bpl",
-            "dest" : "bin",
-            "install": true,
-            "designOnly" : true
+            "src" : "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
+            "install": true
           }
          ],
          "build" : [

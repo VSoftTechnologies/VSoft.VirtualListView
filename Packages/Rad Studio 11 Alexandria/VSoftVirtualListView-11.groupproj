@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{08B76EC8-CDF3-4DAC-B13A-D05123C2FE33}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="VSoft.VirtualListViewR.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="VSoft.VirtualListViewD.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="VSoft_VirtualListViewR">
+        <MSBuild Projects="VSoft.VirtualListViewR.dproj"/>
+    </Target>
+    <Target Name="VSoft_VirtualListViewR:Clean">
+        <MSBuild Projects="VSoft.VirtualListViewR.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VSoft_VirtualListViewR:Make">
+        <MSBuild Projects="VSoft.VirtualListViewR.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VSoft_VirtualListViewD">
+        <MSBuild Projects="VSoft.VirtualListViewD.dproj"/>
+    </Target>
+    <Target Name="VSoft_VirtualListViewD:Clean">
+        <MSBuild Projects="VSoft.VirtualListViewD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VSoft_VirtualListViewD:Make">
+        <MSBuild Projects="VSoft.VirtualListViewD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="VSoft_VirtualListViewR;VSoft_VirtualListViewD"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="VSoft_VirtualListViewR:Clean;VSoft_VirtualListViewD:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="VSoft_VirtualListViewR:Make;VSoft_VirtualListViewD:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
