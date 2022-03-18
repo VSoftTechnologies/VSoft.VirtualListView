@@ -13,6 +13,10 @@ uses
   Vcl.StdCtrls,
   Vcl.Forms;
 
+{$IF CompilerVersion >= 24.0}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
 type
 
   TScrollDirection = (sdUp, sdDown);
@@ -52,6 +56,7 @@ type
     procedure SetCurrentRow(const Value: Int64);
 
   protected
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 33}; isDpiChange: Boolean{$IFEND} ); override;
     procedure AdjustClientRect(var Rect: TRect); override;
     procedure UpdateScrollBar;
 
@@ -139,7 +144,6 @@ type
     property ParentBackground;
     property ParentColor;
     {$IF CompilerVersion >= 24.0}
-      {$LEGACYIFEND ON}
     property StyleElements;
     {$IFEND}
     property TabOrder;
@@ -168,6 +172,15 @@ uses
 procedure TVSoftVirtualListView.AdjustClientRect(var Rect: TRect);
 begin
   inherited AdjustClientRect(Rect);
+end;
+
+procedure TVSoftVirtualListView.ChangeScale(M, D: Integer{$IF CompilerVersion > 33}; isDpiChange: Boolean{$IFEND} );
+begin
+  inherited;
+  FRowHeight := MulDiv(FRowHeight, M, D);
+  Self.Font.Size := MulDiv(Self.Font.Size, M, D); //surely the base class should do this.
+  FPaintBmp.Canvas.Font := Self.Font;
+  UpdateVisibleRows;
 end;
 
 procedure TVSoftVirtualListView.CMEnter(var Message: TCMEnter);

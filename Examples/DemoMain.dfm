@@ -10,7 +10,8 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
+  OldCreateOrder = True
+  OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -82,22 +83,5 @@ object Form2: TForm2
       TabOrder = 3
       OnClick = Button4Click
     end
-  end
-  object VListView: TVSoftVirtualListView
-    Left = 0
-    Top = 0
-    Width = 484
-    Height = 411
-    Align = alClient
-    BevelInner = bvNone
-    BevelKind = bkFlat
-    BorderStyle = bsNone
-    ParentBackground = True
-    TabOrder = 1
-    RowCount = 0
-    RowHeight = 80
-    OnPaintRow = VListViewPaintRow
-    OnPaintNoRows = VListViewPaintNoRows
-    OnRowChange = VListViewRowChange
   end
 end
