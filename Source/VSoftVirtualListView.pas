@@ -26,6 +26,7 @@ type
   TPaintRowEvent = procedure(const Sender : TObject; const ACanvas : TCanvas; const itemRect : TRect; const index : Int64; const state : TPaintRowState) of object;
   TPaintNoRowsEvent = procedure(const Sender : TObject; const ACanvas : TCanvas; const paintRect : TRect) of object;
   TRowChangeEvent = procedure(const Sender : TObject; const newRowIndex : Int64; const direction : TScrollDirection; const delta : Int64 ) of object;
+  TBeforeRowChangeEvent = procedure(const Sender : TObject; const currentRowIndex : Int64; const direction : TScrollDirection; const delta : Int64; var newRowIndex : Int64) of object;
 
   TVSoftVirtualListView = class(TCustomControl)
   private
@@ -33,6 +34,7 @@ type
     FPaintBmp : TBitmap;
     FOnPaintRow : TPaintRowEvent;
     FOnPaintNoRows : TPaintNoRowsEvent;
+    FOnBeforeRowChangeEvent : TBeforeRowChangeEvent;
     FOnRowChangeEvent : TRowChangeEvent;
 
     FUpdating : boolean;
@@ -46,9 +48,10 @@ type
     FTopRow : Int64; //this is the top row cursor .
     FCurrentRow : Int64; //this is our currently selected row.
 
-    FHoverRow : integer; //mouse over row in view (add to top row to get index)
+    FHoverRow : Int64; //mouse over row in view (add to top row to get index)
 
-    FRowRects : TList<TRect>;
+    FRowRects : TArray<TRect>;
+
 
     FScrollPos : Int64;
     FScrollBarVisible : boolean;
@@ -56,7 +59,7 @@ type
     procedure SetCurrentRow(const Value: Int64);
 
   protected
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 33}; isDpiChange: Boolean{$IFEND} ); override;
+
     procedure AdjustClientRect(var Rect: TRect); override;
     procedure UpdateScrollBar;
 
@@ -65,7 +68,7 @@ type
     function IsAtTop : boolean;
     function IsAtEnd : boolean;
 
-    procedure DoRowChanged(const oldCurrentRow : integer);
+    procedure DoRowChanged(const oldCurrentRow : Int64);
 
     procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
@@ -123,6 +126,8 @@ type
     destructor Destroy;override;
     class constructor Create;
     class destructor Destroy;
+    //made public so we can call it from host control as it doesn't seem to get called in the IDE.
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 33}; isDpiChange: Boolean{$IFEND} ); override;
     procedure ScrollInView(const index : Int64);
     procedure InvalidateRow(const index : Int64);
     property CurrentRow : Int64 read FCurrentRow write SetCurrentRow;
@@ -156,6 +161,7 @@ type
     property RowHeight : integer read FRowHeight write SetRowHeight;
     property OnPaintRow : TPaintRowEvent read FOnPaintRow write FOnPaintRow;
     property OnPaintNoRows : TPaintNoRowsEvent read FOnPaintNoRows write FOnPaintNoRows;
+    property OnBeforeRowChangeEvent : TBeforeRowChangeEvent read FOnBeforeRowChangeEvent write FOnBeforeRowChangeEvent;
     property OnRowChange : TRowChangeEvent read FOnRowChangeEvent write FOnRowChangeEvent;
   end;
 
@@ -178,7 +184,7 @@ procedure TVSoftVirtualListView.ChangeScale(M, D: Integer{$IF CompilerVersion > 
 begin
   inherited;
   FRowHeight := MulDiv(FRowHeight, M, D);
-  Self.Font.Size := MulDiv(Self.Font.Size, M, D); //surely the base class should do this.
+//  Self.Font.Height := MulDiv(Self.Font.Height, M, D); //surely the base class should do this.
   FPaintBmp.Canvas.Font := Self.Font;
   UpdateVisibleRows;
 end;
@@ -224,7 +230,7 @@ begin
 
   FBorderStyle := bsSingle;
   FScrollBarVisible := false;
-  FRowRects := TList<TRect>.Create;
+  SetLength(FRowRects, 0);
   ControlStyle := [csDoubleClicks, csCaptureMouse, csDisplayDragImage, csClickEvents, csPannable];
   FScrollPos := 0;
   FHoverRow := -1;
@@ -234,6 +240,7 @@ begin
   ParentBackground := true;
   ParentColor := true;
   ParentDoubleBuffered := false;
+  ParentFont := true;
   DoubleBuffered := false;
 end;
 
@@ -271,7 +278,6 @@ end;
 
 destructor TVSoftVirtualListView.Destroy;
 begin
-  FRowRects.Free;
   FPaintBmp.Free;
   inherited;
 end;
@@ -321,16 +327,15 @@ begin
   end;
 end;
 
-procedure TVSoftVirtualListView.DoRowChanged(const oldCurrentRow : integer);
+procedure TVSoftVirtualListView.DoRowChanged(const oldCurrentRow : Int64);
 var
-  delta : integer;
+  delta : Int64;
   direction : TScrollDirection;
+  newCurrentRow : Int64;
 begin
   if FRowCount = 0 then
     exit;
 
-  if not Assigned(FOnRowChangeEvent) then
-    exit;
 
   delta := FCurrentRow - oldCurrentRow;
   if delta = 0 then
@@ -340,7 +345,28 @@ begin
   else
     direction := TScrollDirection.sdDown;
 
-  FOnRowChangeEvent(Self,FCurrentRow, direction, delta);
+  if Assigned(FOnBeforeRowChangeEvent) then
+  begin
+    newCurrentRow := FCurrentRow;
+    FOnBeforeRowChangeEvent(self, oldCurrentRow, direction, delta, newCurrentRow);
+    if (newCurrentRow >= 0) and (newCurrentRow < FRowCount) then
+    begin
+      FCurrentRow := newCurrentRow;
+      if FCurrentRow = oldCurrentRow then
+        exit;
+      delta := FCurrentRow - oldCurrentRow;
+      if delta = 0 then
+        exit
+      else if delta < 0 then
+        direction := TScrollDirection.sdUp
+      else
+        direction := TScrollDirection.sdDown;
+    end;
+
+  end;
+
+  if Assigned(FOnRowChangeEvent) then
+    FOnRowChangeEvent(Self,FCurrentRow, direction, delta);
 end;
 
 procedure TVSoftVirtualListView.DoTrack(const newScrollPostition: integer);
@@ -664,6 +690,7 @@ begin
         DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
         DoRowChanged(oldCurrentRow);
         FScrollPos := FTopRow;
+        Invalidate;
         UpdateScrollBar;
       end
       else
@@ -766,6 +793,7 @@ class destructor TVSoftVirtualListView.Destroy;
 begin
   TCustomStyleEngine.UnRegisterStyleHook(TVSoftVirtualListView, TScrollingStyleHook);
 end;
+
 
 procedure TVSoftVirtualListView.DoGoBottom;
 var
@@ -874,8 +902,8 @@ begin
           DoOnPaintRow(FRowRects[GetViewRow(oldCurrentRow)], oldCurrentRow , rowState);
         end;
         rowState := GetRowPaintState(FCurrentRow);
-        DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
         DoRowChanged(oldCurrentRow);
+        DoOnPaintRow(FRowRects[GetViewRow(FCurrentRow)], FCurrentRow , rowState);
         FScrollPos := FTopRow;
         UpdateScrollBar;
       end
@@ -1131,8 +1159,9 @@ begin
       //add 1 to ensure a partial row is painted.
       FVisibleRows  := FVisibleRows + 1;
     end;
+    SetLength(FRowRects, FVisibleRows);
+    UpdateScrollBar;
 
-    FRowRects.Clear;
     offset := 0;
     r := GetClientRect;
     //pre caculate the row rect's to avoid doing it in paint
@@ -1143,9 +1172,8 @@ begin
         r.Height := FRowHeight
       else
         r.Height := ClientHeight - r.Top;
-      FRowRects.Add(r);
+      FRowRects[i] := r;
     end;
-    UpdateScrollBar;
   end;
   FUpdating := false;
 end;

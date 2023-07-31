@@ -1,7 +1,7 @@
 {
    "metadata":{
       "id":"VSoft.VirtualListView",
-      "version":"0.3.0",
+      "version":"0.4.1",
       "description":"Owner drawn VCL Virtual List View",
       "owners":"VSoft Technologies Pty Ltd",
       "authors":"Vincent Parrett",
