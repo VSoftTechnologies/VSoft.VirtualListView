@@ -1,11 +1,12 @@
 {
    "metadata":{
       "id":"VSoft.VirtualListView",
-      "version":"0.4.1",
+      "version":"0.4.2",
       "description":"Owner drawn VCL Virtual List View",
       "owners":"VSoft Technologies Pty Ltd",
       "authors":"Vincent Parrett",
       "projectUrl":"https://github.com/VSoftTechnologies/VSoft.VirtualListView",
+      "repositoryUrl":"https://github.com/VSoftTechnologies/VSoft.VirtualListView",
       "license":"Apache-2.0",
       "copyright":"Vincent Parrett and contributors",
       "tags":"vcl listview virtual"
