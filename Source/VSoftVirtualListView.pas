@@ -28,6 +28,7 @@ type
   TRowChangeEvent = procedure(const Sender : TObject; const newRowIndex : Int64; const direction : TScrollDirection; const delta : Int64 ) of object;
   TBeforeRowChangeEvent = procedure(const Sender : TObject; const currentRowIndex : Int64; const direction : TScrollDirection; const delta : Int64; var newRowIndex : Int64) of object;
 
+  [ComponentPlatformsAttribute(pidWin32 or pidWin64)]
   TVSoftVirtualListView = class(TCustomControl)
   private
     FBorderStyle : TBorderStyle;
