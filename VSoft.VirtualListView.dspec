@@ -1,193 +1,200 @@
 {
- "metadata": {
-  "id": "VSoft.VirtualListView",
-  "version": "0.4.5",
-  "description": "Owner drawn VCL Virtual List View",
-  "authors": "Vincent Parrett",
-  "projectUrl": "https://github.com/VSoftTechnologies/VSoft.VirtualListView",
-  "repositoryUrl": "https://github.com/VSoftTechnologies/VSoft.VirtualListView",
-  "license": "Apache-2.0",
-  "copyright": "Vincent Parrett and contributors",
-  "tags": "vcl listview virtual",
-  "readme": "README.md"
- },
- "targetPlatforms": [
-  {
-   "compiler": "12.0",
-   "platforms": "Win32, Win64",
-   "template": "default"
+  "metadata": {
+    "id": "VSoft.VirtualListView",
+    "version": "0.4.6",
+    "description": "Owner drawn VCL Virtual List View",
+    "authors": "Vincent Parrett",
+    "projectUrl": "https://github.com/VSoftTechnologies/VSoft.VirtualListView",
+    "repositoryUrl": "https://github.com/VSoftTechnologies/VSoft.VirtualListView",
+    "repositoryCommit": "#HASH#",
+    "license": "Apache-2.0",
+    "copyright": "Vincent Parrett and contributors",
+    "tags": "vcl listview virtual",
+    "readme": "README.md"
   },
-  {
-   "compiler": "11.0",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "10.4",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "10.3",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "10.2",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "10.1",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "10.0",
-   "platforms": "Win32, Win64",
-   "template": "Seattle"
-  },
-  {
-   "compiler": "XE8",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE7",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE6",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE5",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE4",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE3",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "XE2",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  },
-  {
-   "compiler": "13.0",
-   "platforms": "Win32, Win64",
-   "template": "default"
-  }
- ],
- "templates": [
-  {
-   "name": "default",
-   "source": [
+  "targetPlatforms": [
     {
-     "src": "source\\*.pas",
-     "dest": "Source",
-     "flatten": true
+      "compiler": "XE2",
+      "platforms": "Win32, Win64",
+      "template": "default"
     },
     {
-     "src": "packages\\Rad Studio $Compiler$\\*.dp*",
-     "dest": "packages\\Rad Studio $Compiler$",
-     "exclude": [
-      "*.dproj.local"
-     ]
-    }
-   ],
-   "searchPaths": [
-    {
-     "path": "Source"
-    }
-   ],
-   "build": [
-    {
-     "id": "VirtualListViewR$libsuffix$.bpl",
-     "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
-     "config": "Release",
-     "buildForDesign": true
+      "compiler": "XE3",
+      "platforms": "Win32, Win64",
+      "template": "default"
     },
     {
-     "id": "VirtualListViewD$libsuffix$.bpl",
-     "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
-     "designOnly": true,
-     "config": "Release"
-    }
-   ],
-   "design": [
-    {
-     "buildId": "VirtualListViewD$libsuffix$.bpl",
-     "src": "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
-     "install": true
-    }
-   ],
-   "runtime": [
-    {
-     "buildId": "VirtualListViewR$libsuffix$.bpl",
-     "src": "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
-     "copyLocal": true
-    }
-   ]
-  },
-  {
-   "name": "Seattle",
-   "source": [
-    {
-     "src": "source\\*.pas",
-     "dest": "Source",
-     "flatten": true
+      "compiler": "XE4",
+      "platforms": "Win32, Win64",
+      "template": "default"
     },
     {
-     "src": "packages\\Rad Studio $CompilerWithCodeName$\\*.dp*",
-     "dest": "packages\\Rad Studio $CompilerWithCodeName$",
-     "exclude": [
-      "*.dproj.local"
-     ]
-    }
-   ],
-   "searchPaths": [
-    {
-     "path": "Source"
-    }
-   ],
-   "build": [
-    {
-     "id": "VirtualListViewR$libsuffix$.bpl",
-     "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
-     "config": "Release",
-     "buildForDesign": true
+      "compiler": "XE5",
+      "platforms": "Win32, Win64",
+      "template": "default"
     },
     {
-     "id": "VirtualListViewD$libsuffix$.bpl",
-     "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
-     "designOnly": true,
-     "config": "Release"
-    }
-   ],
-   "design": [
+      "compiler": "XE6",
+      "platforms": "Win32, Win64",
+      "template": "default"
+    },
     {
-     "buildId": "VirtualListViewD$libsuffix$.bpl",
-     "src": "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
-     "install": true
-    }
-   ],
-   "runtime": [
+      "compiler": "XE7",
+      "platforms": "Win32, Win64",
+      "template": "default"
+    },
     {
-     "buildId": "VirtualListViewR$libsuffix$.bpl",
-     "src": "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
-     "copyLocal": true
+      "compiler": "XE8",
+      "platforms": "Win32, Win64",
+      "template": "default"
+    },
+    {
+      "compiler": "10.0",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "10.1",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "10.2",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "10.3",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "10.4",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "11.0",
+      "platforms": "Win32, Win64",
+      "template": "Seattle"
+    },
+    {
+      "compiler": "12.0",
+      "platforms": "Win32, Win64",
+      "template": "Seattle",
+	  "variables": {
+		"CompilerCodeName": ""
+	  }
+    },
+    {
+      "compiler": "13.0",
+      "platforms": "Win32, Win64",
+      "template": "Seattle",
+	  "variables": {
+		"CompilerCodeName": ""
+	  }
     }
-   ]
-  }
- ]
+  ],
+  "templates": [
+    {
+      "name": "default",
+      "source": [
+        {
+          "src": "source\\*.pas",
+          "dest": "Source",
+          "flatten": true
+        },
+        {
+          "src": "packages\\Rad Studio $Compiler$\\*.dp*",
+          "dest": "packages\\Rad Studio $Compiler$",
+          "exclude": [
+            "*.dproj.local"
+          ]
+        }
+      ],
+      "searchPaths": [
+        {
+          "path": "Source"
+        }
+      ],
+      "build": [
+        {
+          "id": "VirtualListViewR$libsuffix$.bpl",
+          "project": "packages\\Rad Studio $Compiler$\\VSoft.VirtualListViewR.dproj",
+          "config": "Release",
+          "buildForDesign": true
+        },
+        {
+          "id": "VirtualListViewD$libsuffix$.bpl",
+          "project": "packages\\Rad Studio $Compiler$\\VSoft.VirtualListViewD.dproj",
+          "designOnly": true,
+          "config": "Release"
+        }
+      ],
+      "design": [
+        {
+          "buildId": "VirtualListViewD$libsuffix$.bpl",
+          "src": "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
+          "install": true
+        }
+      ],
+      "runtime": [
+        {
+          "buildId": "VirtualListViewR$libsuffix$.bpl",
+          "src": "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
+          "copyLocal": true
+        }
+      ]
+    },
+    {
+      "name": "Seattle",
+      "source": [
+        {
+          "src": "source\\*.pas",
+          "dest": "Source",
+          "flatten": true
+        },
+        {
+          "src": "packages\\Rad Studio $CompilerWithCodeName$\\*.dp*",
+          "dest": "packages\\Rad Studio $CompilerWithCodeName$",
+          "exclude": [
+            "*.dproj.local"
+          ]
+        }
+      ],
+      "searchPaths": [
+        {
+          "path": "Source"
+        }
+      ],
+      "build": [
+        {
+          "id": "VirtualListViewR$libsuffix$.bpl",
+          "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewR.dproj",
+          "config": "Release",
+          "buildForDesign": true
+        },
+        {
+          "id": "VirtualListViewD$libsuffix$.bpl",
+          "project": "packages\\Rad Studio $CompilerWithCodeName$\\VSoft.VirtualListViewD.dproj",
+          "designOnly": true,
+          "config": "Release"
+        }
+      ],
+      "design": [
+        {
+          "buildId": "VirtualListViewD$libsuffix$.bpl",
+          "src": "bin\\VSoft.VirtualListViewD$libsuffix$.bpl",
+          "install": true
+        }
+      ],
+      "runtime": [
+        {
+          "buildId": "VirtualListViewR$libsuffix$.bpl",
+          "src": "bin\\VSoft.VirtualListViewR$libsuffix$.bpl",
+          "copyLocal": true
+        }
+      ]
+    }
+  ]
 }
