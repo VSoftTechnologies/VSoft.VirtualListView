@@ -14,7 +14,7 @@ metadata:
   readme: README.md
   copyright: Vincent Parrett and contributors
   tags: [ vcl, listview, virtual ]
-  repositoryCommit: Id:abc27cd2623d2522d530f30e178a622ee627fc3d
+  repositoryCommit: #HASH#
 
 # define variable defaults - can be overriden in targetPlatforms
 variables:
